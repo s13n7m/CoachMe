@@ -166,7 +166,7 @@ function requireAuth(){
 }
 
 function hydrateProgress(){
-  return supabaseClient.from("attempts").select("question_id,passed,query_text,created_at").eq("mode","trainer").order("created_at",{ascending:true})
+  return supabaseClient.from("attempts").select("question_id,passed,query_text,created_at").eq("mode","trainer").eq("track","sql").order("created_at",{ascending:true})
     .then(({data,error})=>{
       if(error||!data) return;
       data.forEach(r=>{
@@ -178,11 +178,12 @@ function hydrateProgress(){
 
 function logAttempt(questionId,queryText,passed){
   if(!supabaseClient||!currentUser) return;
-  supabaseClient.from("attempts").insert({question_id:questionId,query_text:queryText,passed,mode:"trainer"}).then(()=>{});
+  supabaseClient.from("attempts").insert({question_id:questionId,query_text:queryText,passed,mode:"trainer",track:"sql"}).then(()=>{});
 }
 
 initSupabase();
 initThemeToggle();
+initTrainerSelect();
 
 window.addEventListener("scroll",()=>{
   document.body.classList.toggle("scrolled",window.scrollY>30);

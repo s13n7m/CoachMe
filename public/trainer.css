@@ -58,6 +58,8 @@
   .brand{display:flex;align-items:center;gap:14px;}
   .brand img.logo{height:28px;width:auto;display:block;}
   .brand h1{font-size:18px;font-weight:700;letter-spacing:-0.01em;margin:0;color:var(--heading);}
+  .trainer-select{font-family:var(--sans);font-size:18px;font-weight:700;letter-spacing:-0.01em;color:var(--heading);background:var(--panel);border:1px solid transparent;border-radius:6px;padding:2px 4px;cursor:pointer;touch-action:manipulation;}
+  .trainer-select:hover{border-color:var(--line);}
   .brand .tick{font-family:var(--mono);color:var(--pp-blue);font-size:13px;border:1px solid var(--accent-dim);background:var(--tint);padding:1px 8px;border-radius:4px;}
   .brand small{color:var(--muted);font-size:12.5px;}
   .progress{font-family:var(--mono);font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:nowrap;flex-basis:100%;}
@@ -205,7 +207,7 @@
 
   @media (max-width:480px){
     header{padding:10px 14px;}
-    .brand h1{font-size:16px;}
+    .brand h1,.trainer-select{font-size:16px;}
     .brand img.logo{height:22px;}
     main{padding:14px 12px;}
     .prompt{font-size:15.5px;}

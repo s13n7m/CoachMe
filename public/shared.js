@@ -52,3 +52,9 @@ function initThemeToggle(){
     applyThemeIcon();
   });
 }
+
+function initTrainerSelect(){
+  const sel=document.getElementById("trainerSelect");
+  if(!sel) return;
+  sel.addEventListener("change",()=>{window.location.href=sel.value;});
+}

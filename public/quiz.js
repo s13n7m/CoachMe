@@ -116,7 +116,7 @@ function requireAuth(){
 }
 
 function checkUnlocked(){
-  return supabaseClient.from("attempts").select("question_id").eq("mode","trainer").eq("passed",true).lt("question_id",60)
+  return supabaseClient.from("attempts").select("question_id").eq("mode","trainer").eq("track","sql").eq("passed",true).lt("question_id",60)
     .then(({data,error})=>{
       if(error||!data) return false;
       const distinct=new Set(data.map(r=>r.question_id));
@@ -125,7 +125,7 @@ function checkUnlocked(){
 }
 
 function hydrateProgress(){
-  return supabaseClient.from("attempts").select("question_id,passed,query_text,created_at").eq("mode","quiz").order("created_at",{ascending:true})
+  return supabaseClient.from("attempts").select("question_id,passed,query_text,created_at").eq("mode","quiz").eq("track","sql").order("created_at",{ascending:true})
     .then(({data,error})=>{
       if(error||!data) return;
       data.forEach(r=>{
@@ -137,7 +137,7 @@ function hydrateProgress(){
 
 function logAttempt(questionId,queryText,passed){
   if(!supabaseClient||!currentUser) return;
-  supabaseClient.from("attempts").insert({question_id:questionId,query_text:queryText,passed,mode:"quiz"}).then(()=>{});
+  supabaseClient.from("attempts").insert({question_id:questionId,query_text:queryText,passed,mode:"quiz",track:"sql"}).then(()=>{});
 }
 
 function showLocked(){
@@ -151,6 +151,7 @@ function showLocked(){
 
 initSupabase();
 initThemeToggle();
+initTrainerSelect();
 
 window.addEventListener("scroll",()=>{
   document.body.classList.toggle("scrolled",window.scrollY>30);
