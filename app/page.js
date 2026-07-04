@@ -6,7 +6,7 @@ import { HEADER_HTML } from "./header-markup";
 export default function Page() {
   return (
     <>
-      <div dangerouslySetInnerHTML={{ __html: HEADER_HTML }} />
+      <header dangerouslySetInnerHTML={{ __html: HEADER_HTML }} />
 
       <button id="signOutBtn" className="sign-out-btn">
         Sign out
