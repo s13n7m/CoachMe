@@ -7,7 +7,10 @@ export const HEADER_HTML = `
     <span class="tick" id="qtick">Q1</span>
     <small>Consumer Portfolio Growth &middot; live grading on a payments dataset</small>
   </div>
-  <a class="quiz-link locked" id="quizBtn" href="/quiz">Quiz &rarr;</a>
+  <div class="header-actions">
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">&#127769;</button>
+    <a class="quiz-link locked" id="quizBtn" href="/quiz">Quiz &rarr;</a>
+  </div>
   <div class="progress" id="progressLine">
     <span class="pdone"><b id="doneCount">0</b></span>
     <span class="pmid"> of </span>
@@ -24,7 +27,10 @@ export const QUIZ_HEADER_HTML = `
     <span class="tick">Quiz</span>
     <small>Certification quiz &middot; one question per topic</small>
   </div>
-  <a class="quiz-link" id="backBtn" href="/">&larr; Back to Trainer</a>
+  <div class="header-actions">
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">&#127769;</button>
+    <a class="quiz-link" id="backBtn" href="/">&larr; Back to Trainer</a>
+  </div>
   <div class="progress" id="progressLine">
     <span class="pdone"><b id="doneCount">0</b></span>
     <span class="pmid"> of </span>

@@ -30,3 +30,25 @@ function buildSchema(){
   SCHEMA_VIEW.forEach(t=>{html+='<div class="tbl"><div class="name">'+t.name+'</div><ul>';t.cols.forEach(c=>{html+='<li><b>'+c[0]+'</b><span class="ty">'+c[1]+'</span></li>';});html+='</ul></div>';});
   return html+'</div>';
 }
+
+function getEffectiveTheme(){
+  const saved=localStorage.getItem("theme");
+  if(saved) return saved;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+function applyThemeIcon(){
+  const btn=document.getElementById("themeToggle");
+  if(!btn) return;
+  btn.textContent = getEffectiveTheme()==="dark" ? "☀️" : "🌙";
+}
+function initThemeToggle(){
+  applyThemeIcon();
+  const btn=document.getElementById("themeToggle");
+  if(!btn) return;
+  btn.addEventListener("click",()=>{
+    const next = getEffectiveTheme()==="dark" ? "light" : "dark";
+    localStorage.setItem("theme",next);
+    document.documentElement.setAttribute("data-theme",next);
+    applyThemeIcon();
+  });
+}

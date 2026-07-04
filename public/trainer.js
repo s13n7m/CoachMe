@@ -179,6 +179,7 @@ function logAttempt(questionId,queryText,passed){
 }
 
 initSupabase();
+initThemeToggle();
 
 window.addEventListener("scroll",()=>{
   document.body.classList.toggle("scrolled",window.scrollY>30);
