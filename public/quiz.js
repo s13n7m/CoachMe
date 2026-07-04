@@ -2,6 +2,7 @@ const QUIZ_QUESTIONS = [{"id": 0, "topic": "SELECT and DISTINCT", "diff": "easy"
 
 let current=0;
 const solved=new Set();
+const savedQueries={};
 let startIndex=0;
 
 function buildSidebar(){
@@ -32,7 +33,7 @@ function loadQuestion(i){
   current=i;const q=QUIZ_QUESTIONS[i];
   document.getElementById("qhead").innerHTML='<span class="pill '+q.diff+'">'+q.diff+'</span><span class="pill">'+q.topic+'</span><span class="cleared '+(solved.has(i)?"show":"")+'" id="clearedStamp">cleared</span>';
   document.getElementById("askText").textContent=q.ask;
-  document.getElementById("sql").value="";
+  document.getElementById("sql").value=savedQueries[q.id]||"";
   document.getElementById("verdict").className="verdict";
   document.getElementById("resultsBox").style.display="none";
   document.getElementById("solution").className="solution";
@@ -68,7 +69,7 @@ function doRun(){
   document.getElementById("rowCount").textContent=n+" row"+(n===1?"":"s")+" returned"+(n>200?" (showing first 200)":"");
   let solRes;try{solRes=runSQL(q.solution);}catch(e){solRes={columns:[],values:[]};}
   const g=grade(userRes,solRes,q.ordered);
-  if(g.ok){verdict.className="verdict ok";vic.textContent="✓";vmsg.textContent=g.msg;markSolved(current);}
+  if(g.ok){verdict.className="verdict ok";vic.textContent="✓";vmsg.textContent=g.msg;markSolved(current);savedQueries[q.id]=sql;}
   else{verdict.className="verdict no";vic.textContent="✗";vmsg.textContent=g.msg;}
   logAttempt(q.id,sql,g.ok);
 }
@@ -124,10 +125,12 @@ function checkUnlocked(){
 }
 
 function hydrateProgress(){
-  return supabaseClient.from("attempts").select("question_id,passed,created_at").eq("mode","quiz").order("created_at",{ascending:true})
+  return supabaseClient.from("attempts").select("question_id,passed,query_text,created_at").eq("mode","quiz").order("created_at",{ascending:true})
     .then(({data,error})=>{
       if(error||!data) return;
-      data.forEach(r=>{if(r.passed) solved.add(r.question_id);});
+      data.forEach(r=>{
+        if(r.passed){solved.add(r.question_id);savedQueries[r.question_id]=r.query_text;}
+      });
       if(data.length) startIndex=data[data.length-1].question_id;
     });
 }

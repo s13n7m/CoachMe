@@ -4,6 +4,7 @@ const QUESTIONS = [{"id": 0, "topic": "SELECT and DISTINCT", "diff": "easy", "or
 
 let current=0;
 const solved=new Set();
+const savedQueries={};
 
 function topicIndices(topic){const out=[];QUESTIONS.forEach((q,i)=>{if(q.topic===topic)out.push(i);});return out;}
 function topicRequiredIndices(topic){return topicIndices(topic).filter(i=>!QUESTIONS[i].bonus);}
@@ -32,7 +33,7 @@ function buildMain(){
     +'<div class="readystrip"><div class="rt" id="rtTitle"></div><span class="rbar"><i id="rbar"></i></span><span class="rlabel" id="rlabel"></span></div>'
     +'<div class="lesson" id="lesson"><div class="lesson-head" id="lessonHead"><span class="lh" id="lessonTitle">Lesson</span><span class="chev" id="chev">hide</span></div><div class="lesson-body" id="lessonBody"></div></div>'
     +'<div class="ask" id="ask"><span class="albl">How it comes up in the interview</span><span class="atext" id="askText"></span></div>'
-    +'<div class="promptbox collapsed" id="promptBox"><div class="prompt-head" id="promptHead"><span class="plbl">Write the query</span><span class="chev" id="promptChev">show</span></div><p class="prompt" id="prompt"><span id="promptText"></span></p></div><p class="hint" id="hint"></p>'
+    +'<div class="promptbox collapsed" id="promptBox"><div class="prompt-head" id="promptHead"><span class="plbl">Write the query</span><span class="chev" id="promptChev">show</span></div><p class="prompt" id="prompt"><span id="promptText"></span></p><p class="hint" id="hint"></p></div>'
     +'<div class="editor-wrap"><div class="editor-bar"><span id="editorLabel">query.sql</span><button class="schema-toggle" id="schemaBtn">view schema</button></div><textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea></div>'
     +'<div class="actions"><button class="act run" id="runBtn">Run and check</button><button class="act" id="solBtn">Show solution</button><button class="act" id="resetBtn">Clear</button><button class="act" id="prevBtn">&larr; Previous</button><button class="act" id="nextBtn">Next &rarr;</button><span class="kbd">Cmd / Ctrl + Enter &middot; Shift + &larr;/&rarr;</span></div>'
     +'<div class="verdict" id="verdict"><span class="ic" id="vic"></span><span id="vmsg"></span></div>'
@@ -87,7 +88,7 @@ function loadQuestion(i){
   document.getElementById("promptBox").classList.add("collapsed");
   document.getElementById("promptChev").textContent="show";
   document.getElementById("hint").innerHTML="<b>Hint:</b> "+q.hint;
-  document.getElementById("sql").value="";
+  document.getElementById("sql").value=savedQueries[q.id]||"";
   document.getElementById("verdict").className="verdict";
   document.getElementById("resultsBox").style.display="none";
   document.getElementById("solution").className="solution";
@@ -124,7 +125,7 @@ function doRun(){
   document.getElementById("rowCount").textContent=n+" row"+(n===1?"":"s")+" returned"+(n>200?" (showing first 200)":"");
   let solRes;try{solRes=runSQL(q.solution);}catch(e){solRes={columns:[],values:[]};}
   const g=grade(userRes,solRes,q.ordered);
-  if(g.ok){verdict.className="verdict ok";vic.textContent="\u2713";vmsg.textContent=g.msg;markSolved(current);}
+  if(g.ok){verdict.className="verdict ok";vic.textContent="\u2713";vmsg.textContent=g.msg;markSolved(current);savedQueries[q.id]=sql;}
   else{verdict.className="verdict no";vic.textContent="\u2717";vmsg.textContent=g.msg;}
   logAttempt(q.id,sql,g.ok);
 }
@@ -165,10 +166,12 @@ function requireAuth(){
 }
 
 function hydrateProgress(){
-  return supabaseClient.from("attempts").select("question_id,passed,created_at").eq("mode","trainer").order("created_at",{ascending:true})
+  return supabaseClient.from("attempts").select("question_id,passed,query_text,created_at").eq("mode","trainer").order("created_at",{ascending:true})
     .then(({data,error})=>{
       if(error||!data) return;
-      data.forEach(r=>{if(r.passed) solved.add(r.question_id);});
+      data.forEach(r=>{
+        if(r.passed){solved.add(r.question_id);savedQueries[r.question_id]=r.query_text;}
+      });
       if(data.length) startIndex=data[data.length-1].question_id;
     });
 }
