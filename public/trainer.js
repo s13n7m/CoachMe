@@ -152,7 +152,7 @@ function initSupabase(){
 
 function showSignOutBtn(){
   const btn=document.getElementById("signOutBtn");
-  btn.style.display="block";
+  btn.classList.add("visible");
   btn.addEventListener("click",()=>{
     supabaseClient.auth.signOut().then(()=>window.location.reload());
   });

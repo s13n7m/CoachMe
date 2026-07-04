@@ -8,25 +8,7 @@ export default function Page() {
     <>
       <div dangerouslySetInnerHTML={{ __html: HEADER_HTML }} />
 
-      <button
-        id="signOutBtn"
-        style={{
-          display: "none",
-          position: "fixed",
-          top: 14,
-          right: 22,
-          zIndex: 20,
-          background: "#ffffff",
-          color: "#54708e",
-          border: "1px solid #d4dfec",
-          borderRadius: 99,
-          padding: "6px 14px",
-          fontSize: 12.5,
-          fontFamily:
-            "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",
-          cursor: "pointer",
-        }}
-      >
+      <button id="signOutBtn" className="sign-out-btn">
         Sign out
       </button>
 
@@ -47,7 +29,9 @@ export default function Page() {
             background: "#fff",
             borderRadius: 10,
             padding: "28px 32px",
+            width: "calc(100% - 40px)",
             maxWidth: 340,
+            boxSizing: "border-box",
             textAlign: "center",
             fontFamily:
               "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",
@@ -71,6 +55,7 @@ export default function Page() {
               fontSize: 14,
               fontWeight: 600,
               cursor: "pointer",
+              touchAction: "manipulation",
             }}
           >
             Sign in with Google
