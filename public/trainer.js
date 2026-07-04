@@ -54,7 +54,7 @@ function buildMain(){
     +'<div class="ask" id="ask"><span class="albl">How it comes up in the interview</span><span class="atext" id="askText"></span></div>'
     +'<p class="prompt" id="prompt"><span class="plbl">Write the query</span><span id="promptText"></span></p><p class="hint" id="hint"></p>'
     +'<div class="editor-wrap"><div class="editor-bar"><span id="editorLabel">query.sql</span><button class="schema-toggle" id="schemaBtn">view schema</button></div><textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea></div>'
-    +'<div class="actions"><button class="act run" id="runBtn">Run and check</button><button class="act" id="solBtn">Show solution</button><button class="act" id="resetBtn">Clear</button><span class="kbd">Cmd / Ctrl + Enter</span></div>'
+    +'<div class="actions"><button class="act run" id="runBtn">Run and check</button><button class="act" id="solBtn">Show solution</button><button class="act" id="resetBtn">Clear</button><button class="act" id="prevBtn">&larr; Previous</button><button class="act" id="nextBtn">Next &rarr;</button><span class="kbd">Cmd / Ctrl + Enter &middot; Shift + &larr;/&rarr;</span></div>'
     +'<div class="verdict" id="verdict"><span class="ic" id="vic"></span><span id="vmsg"></span></div>'
     +'<div class="results" id="resultsBox" style="display:none"><h3>Your result</h3><div class="tablescroll" id="tableScroll"></div><div class="rowcount" id="rowCount"></div></div>'
     +'<div class="solution" id="solution"><div class="lbl">One correct solution (there are often several)</div><pre id="solText"></pre></div>'
@@ -109,8 +109,14 @@ function loadQuestion(i){
   document.getElementById("solText").textContent=q.solution;
   const idxs=topicIndices(q.topic);setReadystrip(q.topic,topicDone(q.topic),idxs.length);
   document.querySelectorAll(".qbtn").forEach(b=>b.classList.toggle("active",+b.dataset.i===i));
+  document.getElementById("prevBtn").disabled=(i===0);
+  document.getElementById("nextBtn").disabled=(i===QUESTIONS.length-1);
   window.scrollTo({top:0,behavior:"smooth"});
   document.getElementById("sql").focus();
+}
+function goToQuestion(delta){
+  const next=current+delta;
+  if(next>=0 && next<QUESTIONS.length) loadQuestion(next);
 }
 function markSolved(i){
   if(!solved.has(i)){
@@ -204,12 +210,19 @@ Promise.all([
   document.getElementById("solBtn").addEventListener("click",()=>document.getElementById("solution").classList.toggle("show"));
   document.getElementById("resetBtn").addEventListener("click",()=>{document.getElementById("sql").value="";document.getElementById("sql").focus();});
   document.getElementById("schemaBtn").addEventListener("click",()=>document.getElementById("schema").scrollIntoView({behavior:"smooth"}));
+  document.getElementById("prevBtn").addEventListener("click",()=>goToQuestion(-1));
+  document.getElementById("nextBtn").addEventListener("click",()=>goToQuestion(1));
   const lh=document.getElementById("lessonHead");
   lh.addEventListener("click",()=>{const l=document.getElementById("lesson");l.classList.toggle("collapsed");document.getElementById("chev").textContent=l.classList.contains("collapsed")?"show":"hide";});
   const ta=document.getElementById("sql");
   ta.addEventListener("keydown",e=>{
     if((e.metaKey||e.ctrlKey)&&e.key==="Enter"){e.preventDefault();doRun();}
     if(e.key==="Tab"){e.preventDefault();const s=ta.selectionStart,en=ta.selectionEnd;ta.value=ta.value.slice(0,s)+"  "+ta.value.slice(en);ta.selectionStart=ta.selectionEnd=s+2;}
+  });
+  document.addEventListener("keydown",e=>{
+    if(!e.shiftKey || document.activeElement===ta) return;
+    if(e.key==="ArrowLeft"){e.preventDefault();goToQuestion(-1);}
+    if(e.key==="ArrowRight"){e.preventDefault();goToQuestion(1);}
   });
   updateProgress();loadQuestion(startIndex);
 })

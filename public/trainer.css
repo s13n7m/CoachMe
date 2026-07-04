@@ -90,6 +90,8 @@
   .actions{display:flex;gap:10px;margin:14px 0;flex-wrap:wrap;}
   button.act{font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;border-radius:99px;padding:9px 18px;border:1px solid var(--line);background:#ffffff;color:var(--pp-navy);}
   button.act:hover{border-color:var(--pp-sky);}
+  button.act:disabled{opacity:0.4;cursor:default;}
+  button.act:disabled:hover{border-color:var(--line);}
   button.run{background:var(--pp-blue);color:#ffffff;border-color:var(--pp-blue);}
   button.run:hover{background:#005ea6;border-color:#005ea6;}
   .kbd{font-family:var(--mono);font-size:11px;color:var(--muted);align-self:center;}
