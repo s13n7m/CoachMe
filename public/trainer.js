@@ -52,7 +52,7 @@ function buildMain(){
     +'<div class="readystrip"><div class="rt" id="rtTitle"></div><span class="rbar"><i id="rbar"></i></span><span class="rlabel" id="rlabel"></span></div>'
     +'<div class="lesson" id="lesson"><div class="lesson-head" id="lessonHead"><span class="lh" id="lessonTitle">Lesson</span><span class="chev" id="chev">hide</span></div><div class="lesson-body" id="lessonBody"></div></div>'
     +'<div class="ask" id="ask"><span class="albl">How it comes up in the interview</span><span class="atext" id="askText"></span></div>'
-    +'<p class="prompt" id="prompt"><span class="plbl">Write the query</span><span id="promptText"></span></p><p class="hint" id="hint"></p>'
+    +'<div class="promptbox collapsed" id="promptBox"><div class="prompt-head" id="promptHead"><span class="plbl">Write the query</span><span class="chev" id="promptChev">show</span></div><p class="prompt" id="prompt"><span id="promptText"></span></p></div><p class="hint" id="hint"></p>'
     +'<div class="editor-wrap"><div class="editor-bar"><span id="editorLabel">query.sql</span><button class="schema-toggle" id="schemaBtn">view schema</button></div><textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea></div>'
     +'<div class="actions"><button class="act run" id="runBtn">Run and check</button><button class="act" id="solBtn">Show solution</button><button class="act" id="resetBtn">Clear</button><button class="act" id="prevBtn">&larr; Previous</button><button class="act" id="nextBtn">Next &rarr;</button><span class="kbd">Cmd / Ctrl + Enter &middot; Shift + &larr;/&rarr;</span></div>'
     +'<div class="verdict" id="verdict"><span class="ic" id="vic"></span><span id="vmsg"></span></div>'
@@ -101,6 +101,8 @@ function loadQuestion(i){
   document.getElementById("lessonBody").innerHTML=LESSONS[q.topic];
   document.getElementById("askText").textContent=q.ask;
   document.getElementById("promptText").textContent=q.prompt;
+  document.getElementById("promptBox").classList.add("collapsed");
+  document.getElementById("promptChev").textContent="show";
   document.getElementById("hint").innerHTML="<b>Hint:</b> "+q.hint;
   document.getElementById("sql").value="";
   document.getElementById("verdict").className="verdict";
@@ -111,8 +113,8 @@ function loadQuestion(i){
   document.querySelectorAll(".qbtn").forEach(b=>b.classList.toggle("active",+b.dataset.i===i));
   document.getElementById("prevBtn").disabled=(i===0);
   document.getElementById("nextBtn").disabled=(i===QUESTIONS.length-1);
-  window.scrollTo({top:0,behavior:"smooth"});
-  document.getElementById("sql").focus();
+  document.querySelector("main").scrollIntoView({behavior:"smooth",block:"start"});
+  document.getElementById("sql").focus({preventScroll:true});
 }
 function goToQuestion(delta){
   const next=current+delta;
@@ -195,6 +197,10 @@ function logAttempt(questionId,queryText,passed){
 
 initSupabase();
 
+window.addEventListener("scroll",()=>{
+  document.body.classList.toggle("scrolled",window.scrollY>30);
+},{passive:true});
+
 Promise.all([
   initSqlJs({locateFile:f=>"https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/"+f}),
   requireAuth().then(hydrateProgress)
@@ -214,6 +220,8 @@ Promise.all([
   document.getElementById("nextBtn").addEventListener("click",()=>goToQuestion(1));
   const lh=document.getElementById("lessonHead");
   lh.addEventListener("click",()=>{const l=document.getElementById("lesson");l.classList.toggle("collapsed");document.getElementById("chev").textContent=l.classList.contains("collapsed")?"show":"hide";});
+  const ph=document.getElementById("promptHead");
+  ph.addEventListener("click",()=>{const p=document.getElementById("promptBox");p.classList.toggle("collapsed");document.getElementById("promptChev").textContent=p.classList.contains("collapsed")?"show":"hide";});
   const ta=document.getElementById("sql");
   ta.addEventListener("keydown",e=>{
     if((e.metaKey||e.ctrlKey)&&e.key==="Enter"){e.preventDefault();doRun();}
