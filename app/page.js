@@ -75,6 +75,7 @@ export default function Page() {
         src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
         strategy="beforeInteractive"
       />
+      <Script src="/shared.js" strategy="beforeInteractive" />
       <Script
         id="trainer-config"
         strategy="beforeInteractive"
