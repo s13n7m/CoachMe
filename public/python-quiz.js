@@ -19,6 +19,7 @@ function buildMain(){
     +'<div class="editor-wrap"><div class="editor-bar"><span id="editorLabel">answer.py</span><button class="schema-toggle" id="schemaBtn">view tables</button></div><textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea></div>'
     +'<div class="actions"><button class="act run" id="runBtn">Run and check</button><button class="act" id="solBtn">Show solution</button><button class="act" id="resetBtn">Clear</button><button class="act" id="prevBtn">&larr; Previous</button><button class="act" id="nextBtn">Next &rarr;</button><span class="kbd">Cmd / Ctrl + Enter &middot; Shift + &larr;/&rarr;</span></div>'
     +'<div class="verdict" id="verdict"><span class="ic" id="vic"></span><span id="vmsg"></span></div>'
+    +'<div class="stdoutbox" id="stdoutBox" style="display:none"><div class="lbl">Console output</div><pre id="stdoutText"></pre></div>'
     +'<div class="results" id="resultsBox" style="display:none"><h3>Your result</h3><div class="tablescroll" id="tableScroll"></div><div class="rowcount" id="rowCount"></div></div>'
     +'<div class="solution" id="solution"><div class="lbl">One correct solution (there are often several)</div><pre id="solText"></pre></div>'
     +'<div class="schema" id="schema"></div></main>';
@@ -35,6 +36,7 @@ function loadQuestion(i){
   document.getElementById("askText").textContent=q.ask;
   document.getElementById("sql").value=savedQueries[q.id]||"";
   document.getElementById("verdict").className="verdict";
+  document.getElementById("stdoutBox").style.display="none";
   document.getElementById("resultsBox").style.display="none";
   document.getElementById("solution").className="solution";
   document.getElementById("solText").textContent=q.solution;
@@ -68,6 +70,13 @@ async function doRun(){
     g=await runAndGrade(code, q.solution, q.ordered);
   }finally{
     runBtn.disabled=false;runBtn.textContent="Run and check";
+  }
+  const stdoutBox=document.getElementById("stdoutBox");
+  if(g.stdout && g.stdout.trim()){
+    stdoutBox.style.display="block";
+    document.getElementById("stdoutText").textContent=g.stdout;
+  }else{
+    stdoutBox.style.display="none";
   }
   if(g.error){
     verdict.className="verdict no";vic.textContent="!";vmsg.textContent="Python error: "+g.error;
