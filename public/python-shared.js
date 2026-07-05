@@ -206,16 +206,23 @@ function initShellLayout(){
     const promptBox=document.getElementById("promptBox");
     const editor=document.querySelector(".editor-wrap");
     const actions=document.querySelector(".actions");
+    const explainBox=document.getElementById("explainBox");
     const verdict=document.getElementById("verdict");
+    const schema=document.getElementById("schema");
     const order=[ask,promptBox,editor,actions];
     if(toRight){
       order.forEach(el=>{if(el)right.appendChild(el);});
+      if(explainBox)right.appendChild(explainBox);
     }else{
       order.forEach(el=>{
         if(!el) return;
         if(verdict) main.insertBefore(el,verdict);
         else main.appendChild(el);
       });
+      if(explainBox){
+        if(schema) main.insertBefore(explainBox,schema);
+        else main.appendChild(explainBox);
+      }
     }
   }
 

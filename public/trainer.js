@@ -190,15 +190,15 @@ async function runExplain(kind){
   const txt=document.getElementById("explainText");
   const orig=btn.textContent;
   btn.disabled=true;btn.textContent="Thinking...";
+  box.style.display="block";
+  txt.innerHTML='<div class="explain-loading"><span class="spinner"></span>Thinking through the solution…</div>';
   try{
     const payload={track:"sql",mode:"trainer",questionId:q.id,kind,ask:q.ask,prompt:q.prompt||"",solution:q.solution,model:getExplainModel()};
     if(kind==="attempt")payload.userCode=document.getElementById("sql").value;
     const r=await requestExplanation(payload);
-    box.style.display="block";
     txt.innerHTML=renderMarkdown(r.content);
     box.scrollIntoView({behavior:"smooth",block:"nearest"});
   }catch(e){
-    box.style.display="block";
     txt.textContent=e.message;
   }finally{
     btn.disabled=false;btn.textContent=orig;

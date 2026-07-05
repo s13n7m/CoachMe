@@ -190,8 +190,11 @@
   .lesson-sql{margin:10px 0 14px;border:1px solid var(--line);border-radius:8px;background:#00264f;overflow:auto;}
   .lesson-sql pre{margin:0;padding:12px 14px;font-family:var(--mono);font-size:13px;line-height:1.55;color:#dcebfa;white-space:pre;}
 
-  .explainbox{margin-top:16px;border:1px solid var(--line);border-radius:8px;background:var(--panel);}
+  .explainbox{margin-top:16px;border:2px solid var(--pp-blue);border-radius:8px;background:var(--panel);box-shadow:0 0 16px rgba(0,112,186,0.4),0 0 0 1px rgba(0,112,186,0.15);}
   .explainbox .lbl{padding:8px 12px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11.5px;color:var(--muted);}
+  .explain-loading{display:flex;align-items:center;gap:10px;padding:4px 0;color:var(--muted);font-size:13.5px;}
+  .explain-loading .spinner{width:16px;height:16px;flex:0 0 auto;border:2px solid var(--accent-dim);border-top-color:var(--pp-blue);border-radius:50%;animation:explain-spin .7s linear infinite;}
+  @keyframes explain-spin{to{transform:rotate(360deg);}}
   #explainText{padding:12px 14px;font-size:14px;color:var(--lesson-text);line-height:1.6;}
   #explainText p{margin:0 0 12px;}
   #explainText p:last-child{margin-bottom:0;}
