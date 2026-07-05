@@ -155,29 +155,55 @@ function renderMarkdown(raw){
   return html||"<p></p>";
 }
 
-function initColumnLayout(){
-  const mq=window.matchMedia("(min-width:1180px)");
-  function apply(e){
-    const main=document.querySelector("main");
-    const right=document.getElementById("rightCol");
-    if(!main||!right) return;
-    const editor=main.querySelector(".editor-wrap");
-    const actions=main.querySelector(".actions");
-    const schema=document.getElementById("schema");
+function initShellLayout(){
+  const wrap=document.querySelector(".wrap");
+  const aside=document.getElementById("sidebar");
+  const main=document.querySelector("main");
+  const right=document.getElementById("rightCol");
+  if(!wrap||!aside||!main||!right) return;
+
+  let toggle=document.getElementById("sidebarToggle");
+  if(!toggle){
+    toggle=document.createElement("button");
+    toggle.id="sidebarToggle";
+    toggle.className="sidebar-toggle";
+    toggle.type="button";
+    wrap.insertBefore(toggle,main);
+  }
+
+  const mq=window.matchMedia("(min-width:861px)");
+
+  function moveEditor(toRight){
+    const editor=document.querySelector(".editor-wrap");
+    const actions=document.querySelector(".actions");
     const verdict=document.getElementById("verdict");
-    if(e.matches){
+    if(toRight){
       if(editor)right.appendChild(editor);
       if(actions)right.appendChild(actions);
-      if(schema)right.appendChild(schema);
     }else{
       if(editor&&verdict)main.insertBefore(editor,verdict);
       else if(editor)main.appendChild(editor);
       if(actions&&verdict)main.insertBefore(actions,verdict);
       else if(actions)main.appendChild(actions);
-      if(schema)main.appendChild(schema);
     }
+  }
+
+  function apply(){
+    const collapsed=wrap.classList.contains("sidebar-collapsed");
+    toggle.textContent=collapsed?"›":"‹";
+    toggle.setAttribute("aria-label",collapsed?"Show topic list":"Hide topic list");
+    moveEditor(collapsed&&mq.matches);
     syncHeaderHeight();
   }
+
+  toggle.addEventListener("click",()=>{
+    const collapsed=!wrap.classList.contains("sidebar-collapsed");
+    wrap.classList.toggle("sidebar-collapsed",collapsed);
+    localStorage.setItem("sidebarCollapsed",collapsed?"1":"0");
+    apply();
+  });
   mq.addEventListener("change",apply);
-  apply(mq);
+
+  wrap.classList.toggle("sidebar-collapsed",localStorage.getItem("sidebarCollapsed")==="1");
+  apply();
 }

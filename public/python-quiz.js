@@ -243,7 +243,7 @@ Promise.all([
   document.getElementById("explainBtn").addEventListener("click",()=>runExplain("solution"));
   document.getElementById("explainWrongBtn").addEventListener("click",()=>runExplain("attempt"));
   initExplainModelSelect();
-  initColumnLayout();
+  initShellLayout();
     document.getElementById("solBtn").addEventListener("click",()=>document.getElementById("solution").classList.toggle("show"));
     document.getElementById("resetBtn").addEventListener("click",()=>{document.getElementById("sql").value="";document.getElementById("sql").focus();});
     document.getElementById("schemaBtn").addEventListener("click",()=>document.getElementById("schema").scrollIntoView({behavior:"smooth"}));
