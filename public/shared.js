@@ -160,6 +160,7 @@ function initShellLayout(){
   const aside=document.getElementById("sidebar");
   const main=document.querySelector("main");
   const right=document.getElementById("rightCol");
+  const resizer=document.getElementById("colResizer");
   if(!wrap||!aside||!main||!right) return;
 
   const toggle=document.getElementById("sidebarToggle");
@@ -167,6 +168,7 @@ function initShellLayout(){
   if(!toggle) return;
 
   const mq=window.matchMedia("(min-width:861px)");
+  const MIN_PCT=22,MAX_PCT=65,DEFAULT_PCT=40;
 
   function moveEditor(toRight){
     const ask=document.getElementById("ask");
@@ -186,6 +188,55 @@ function initShellLayout(){
     }
   }
 
+  function applyColumnRatio(){
+    if(!mq.matches){
+      main.style.flex="";
+      right.style.flex="";
+      return;
+    }
+    const pct=Math.min(MAX_PCT,Math.max(MIN_PCT,parseFloat(localStorage.getItem("colSplitPct"))||DEFAULT_PCT));
+    right.style.flex="0 0 "+pct+"%";
+    main.style.flex="1 1 0%";
+  }
+
+  function initResizer(){
+    if(!resizer) return;
+    let startX=0,startPct=DEFAULT_PCT,containerWidth=0;
+    function onMove(e){
+      const x=e.touches?e.touches[0].clientX:e.clientX;
+      const deltaPct=((startX-x)/containerWidth)*100;
+      const pct=Math.min(MAX_PCT,Math.max(MIN_PCT,startPct+deltaPct));
+      right.style.flex="0 0 "+pct+"%";
+      main.style.flex="1 1 0%";
+      localStorage.setItem("colSplitPct",String(pct));
+    }
+    function onUp(){
+      document.body.classList.remove("col-resizing");
+      resizer.classList.remove("dragging");
+      document.removeEventListener("mousemove",onMove);
+      document.removeEventListener("mouseup",onUp);
+      document.removeEventListener("touchmove",onMove);
+      document.removeEventListener("touchend",onUp);
+      syncHeaderHeight();
+    }
+    function onDown(e){
+      if(!mq.matches) return;
+      const x=e.touches?e.touches[0].clientX:e.clientX;
+      startX=x;
+      containerWidth=main.getBoundingClientRect().width+right.getBoundingClientRect().width+resizer.getBoundingClientRect().width;
+      startPct=Math.min(MAX_PCT,Math.max(MIN_PCT,parseFloat(localStorage.getItem("colSplitPct"))||DEFAULT_PCT));
+      document.body.classList.add("col-resizing");
+      resizer.classList.add("dragging");
+      document.addEventListener("mousemove",onMove);
+      document.addEventListener("mouseup",onUp);
+      document.addEventListener("touchmove",onMove,{passive:false});
+      document.addEventListener("touchend",onUp);
+      e.preventDefault();
+    }
+    resizer.addEventListener("mousedown",onDown);
+    resizer.addEventListener("touchstart",onDown,{passive:false});
+  }
+
   function apply(){
     const collapsed=wrap.classList.contains("sidebar-collapsed");
     const label=collapsed?"Show topic list":"Hide topic list";
@@ -195,7 +246,8 @@ function initShellLayout(){
       toggleScrolled.textContent=collapsed?"›":"‹";
       toggleScrolled.setAttribute("aria-label",label);
     }
-    moveEditor(collapsed&&mq.matches);
+    moveEditor(mq.matches);
+    applyColumnRatio();
     syncHeaderHeight();
   }
 
@@ -209,6 +261,7 @@ function initShellLayout(){
   toggle.addEventListener("click",toggleSidebar);
   if(toggleScrolled) toggleScrolled.addEventListener("click",toggleSidebar);
   mq.addEventListener("change",apply);
+  initResizer();
 
   wrap.classList.toggle("sidebar-collapsed",localStorage.getItem("sidebarCollapsed")==="1");
   apply();

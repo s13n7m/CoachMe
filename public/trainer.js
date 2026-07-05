@@ -238,7 +238,7 @@ Promise.all([
 .then(([SQL])=>{
   db=new SQL.Database();db.run(SCHEMA_SQL);
   const app=document.getElementById("app");app.className="";
-  app.innerHTML='<div class="wrap"><aside id="sidebar">'+buildSidebar()+'</aside>'+buildMain()+'<div class="right-col" id="rightCol"></div></div>';
+  app.innerHTML='<div class="wrap"><aside id="sidebar">'+buildSidebar()+'</aside>'+buildMain()+'<div class="col-resizer" id="colResizer"></div><div class="right-col" id="rightCol"></div></div>';
   document.getElementById("schema").innerHTML=buildSchema();
   document.getElementById("totalCount").textContent=requiredCount();
   document.querySelectorAll(".qbtn").forEach(b=>b.addEventListener("click",()=>loadQuestion(+b.dataset.i)));
