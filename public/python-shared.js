@@ -183,6 +183,7 @@ function initShellLayout(){
   if(!wrap||!aside||!main||!right) return;
 
   const toggle=document.getElementById("sidebarToggle");
+  const toggleScrolled=document.getElementById("sidebarToggleScrolled");
   if(!toggle) return;
 
   const mq=window.matchMedia("(min-width:861px)");
@@ -207,18 +208,26 @@ function initShellLayout(){
 
   function apply(){
     const collapsed=wrap.classList.contains("sidebar-collapsed");
+    const label=collapsed?"Show topic list":"Hide topic list";
     toggle.textContent=collapsed?"› Show list":"‹ Hide list";
-    toggle.setAttribute("aria-label",collapsed?"Show topic list":"Hide topic list");
+    toggle.setAttribute("aria-label",label);
+    if(toggleScrolled){
+      toggleScrolled.textContent=collapsed?"›":"‹";
+      toggleScrolled.setAttribute("aria-label",label);
+    }
     moveEditor(collapsed&&mq.matches);
     syncHeaderHeight();
   }
 
-  toggle.addEventListener("click",()=>{
+  function toggleSidebar(){
     const collapsed=!wrap.classList.contains("sidebar-collapsed");
     wrap.classList.toggle("sidebar-collapsed",collapsed);
     localStorage.setItem("sidebarCollapsed",collapsed?"1":"0");
     apply();
-  });
+  }
+
+  toggle.addEventListener("click",toggleSidebar);
+  if(toggleScrolled) toggleScrolled.addEventListener("click",toggleSidebar);
   mq.addEventListener("change",apply);
 
   wrap.classList.toggle("sidebar-collapsed",localStorage.getItem("sidebarCollapsed")==="1");

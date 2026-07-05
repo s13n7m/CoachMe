@@ -25,6 +25,7 @@ function makeHeader({ tick, subtitle, quizHref, quizLabel, quizLocked, activeTra
     <span class="ptotal"><span id="totalCount">0</span></span>
     <span class="pend"> cleared</span>
     <span class="qtimer qtimer-scrolled" id="qtimerScrolled">00:00</span>
+    <button class="sidebar-toggle sidebar-toggle-scrolled" id="sidebarToggleScrolled" type="button" aria-label="Hide sidebar">&#8249;</button>
   </div>
 `;
 }
