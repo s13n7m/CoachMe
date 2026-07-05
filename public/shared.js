@@ -58,3 +58,26 @@ function initTrainerSelect(){
   if(!sel) return;
   sel.addEventListener("change",()=>{window.location.href=sel.value;});
 }
+
+const QUESTION_TIME_BUDGET={easy:180,medium:360,hard:600};
+let questionTimerInterval=null,questionTimerSeconds=0;
+function startQuestionTimer(diff){
+  clearInterval(questionTimerInterval);
+  questionTimerSeconds=0;
+  renderQuestionTimer(diff);
+  questionTimerInterval=setInterval(()=>{questionTimerSeconds++;renderQuestionTimer(diff);},1000);
+}
+function renderQuestionTimer(diff){
+  const budget=QUESTION_TIME_BUDGET[diff]||360;
+  const m=Math.floor(questionTimerSeconds/60),s=questionTimerSeconds%60;
+  const text=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+  let cls="qtimer";
+  if(questionTimerSeconds>budget*2)cls+=" over";
+  else if(questionTimerSeconds>budget)cls+=" warn";
+  ["qtimerMain","qtimerScrolled"].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.textContent=text;
+    el.className=cls+(id==="qtimerScrolled"?" qtimer-scrolled":"");
+  });
+}

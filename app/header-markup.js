@@ -23,6 +23,7 @@ function makeHeader({ tick, subtitle, quizHref, quizLabel, quizLocked, activeTra
     <span class="bar"><i id="progBar"></i></span>
     <span class="ptotal"><span id="totalCount">0</span></span>
     <span class="pend"> cleared</span>
+    <span class="qtimer qtimer-scrolled" id="qtimerScrolled">00:00</span>
   </div>
 `;
 }
