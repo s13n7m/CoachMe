@@ -183,13 +183,20 @@ initTrainerSelect();
 
 window.addEventListener("scroll",()=>{
   document.body.classList.toggle("scrolled",window.scrollY>30);
+  syncHeaderHeight();
+  setTimeout(syncHeaderHeight,200);
 },{passive:true});
 
 if(window.visualViewport){
   window.visualViewport.addEventListener("resize",()=>{
     document.body.classList.toggle("scrolled",window.scrollY>30);
+    syncHeaderHeight();
   });
 }
+
+window.addEventListener("resize",syncHeaderHeight);
+syncHeaderHeight();
+setTimeout(syncHeaderHeight,300);
 
 Promise.all([
   initPyodideEnv(),

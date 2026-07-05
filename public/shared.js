@@ -59,6 +59,12 @@ function initTrainerSelect(){
   sel.addEventListener("change",()=>{window.location.href=sel.value;});
 }
 
+function syncHeaderHeight(){
+  const h=document.querySelector("header");
+  if(!h)return;
+  document.documentElement.style.setProperty("--header-h",h.offsetHeight+"px");
+}
+
 const QUESTION_TIME_BUDGET={easy:180,medium:360,hard:600};
 function estimateLabel(diff){return "~"+Math.round((QUESTION_TIME_BUDGET[diff]||360)/60)+" min";}
 let questionTimerInterval=null,questionTimerSeconds=0;

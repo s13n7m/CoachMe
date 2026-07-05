@@ -19,6 +19,7 @@
     --table-border:#e4ebf4;
     --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
     --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --header-h:96px;
   }
 
   @media (prefers-color-scheme: dark){
@@ -56,7 +57,7 @@
   body{background:var(--page);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;}
   code{font-family:var(--mono);font-size:0.9em;background:var(--code-bg);border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--code-text);}
 
-  header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 22px;padding-right:118px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:10;flex-wrap:wrap;box-shadow:0 1px 4px rgba(0,48,135,0.06);transition:padding .15s ease;transform:translateZ(0);-webkit-transform:translateZ(0);will-change:transform;}
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 22px;padding-right:118px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:10;flex-wrap:wrap;box-shadow:0 1px 4px rgba(0,48,135,0.06);transition:padding .15s ease;}
   .brand{display:flex;align-items:center;gap:14px;}
   .brand img.logo{height:28px;width:auto;display:block;}
   .brand h1{font-size:18px;font-weight:700;letter-spacing:-0.01em;margin:0;color:var(--heading);}
@@ -213,7 +214,13 @@
   .theme-toggle:hover{border-color:var(--pp-sky);}
 
   @media (max-width:860px){
-    .wrap{flex-direction:column;}
+    /* position:fixed instead of sticky on mobile: iOS Safari can detach/hide
+       position:sticky elements after scrolling with the software keyboard
+       open, especially on long pages. Fixed positioning doesn't have that
+       bug, at the cost of needing to reserve space for it explicitly below. */
+    header{position:fixed;top:0;left:0;right:0;width:100%;}
+    body{padding-top:var(--header-h);}
+    .wrap{flex-direction:column;min-height:calc(100vh - var(--header-h));min-height:calc(100dvh - var(--header-h));}
     aside{width:auto;flex:none;position:static;max-height:220px;border:1px solid var(--line);border-radius:8px;margin:10px 12px;box-shadow:0 1px 3px rgba(0,48,135,0.06);}
     main{padding:18px 16px;}
     .brand small{display:none;}
