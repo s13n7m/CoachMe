@@ -81,7 +81,7 @@ function updateQuizGate(done,total){
 function loadQuestion(i){
   current=i;const q=QUESTIONS[i];
   document.getElementById("qtick").textContent="Q"+(i+1);
-  document.getElementById("qhead").innerHTML='<span class="pill '+q.diff+'">'+q.diff+'</span><span class="pill">'+q.topic+'</span><span class="qtimer" id="qtimerMain">00:00</span><span class="cleared '+(solved.has(i)?"show":"")+'" id="clearedStamp">cleared</span>';
+  document.getElementById("qhead").innerHTML='<span class="pill '+q.diff+'">'+q.diff+'</span><span class="pill">'+q.topic+'</span><span class="pill est" id="estBadge">'+estimateLabel(q.diff)+'</span><span class="qtimer" id="qtimerMain">00:00</span><span class="cleared '+(solved.has(i)?"show":"")+'" id="clearedStamp">cleared</span>';
   startQuestionTimer(q.diff);
   const lessonContent=(typeof LESSONS[q.topic]==="object")?LESSONS[q.topic][q.subtopic]:LESSONS[q.topic];
   document.getElementById("lessonBody").innerHTML=lessonContent;
@@ -190,6 +190,12 @@ initTrainerSelect();
 window.addEventListener("scroll",()=>{
   document.body.classList.toggle("scrolled",window.scrollY>30);
 },{passive:true});
+
+if(window.visualViewport){
+  window.visualViewport.addEventListener("resize",()=>{
+    document.body.classList.toggle("scrolled",window.scrollY>30);
+  });
+}
 
 Promise.all([
   initSqlJs({locateFile:f=>"https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/"+f}),

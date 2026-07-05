@@ -60,6 +60,7 @@ function initTrainerSelect(){
 }
 
 const QUESTION_TIME_BUDGET={easy:180,medium:360,hard:600};
+function estimateLabel(diff){return "~"+Math.round((QUESTION_TIME_BUDGET[diff]||360)/60)+" min";}
 let questionTimerInterval=null,questionTimerSeconds=0;
 function startQuestionTimer(diff){
   clearInterval(questionTimerInterval);

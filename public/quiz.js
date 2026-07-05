@@ -31,7 +31,7 @@ function updateProgress(){
 
 function loadQuestion(i){
   current=i;const q=QUIZ_QUESTIONS[i];
-  document.getElementById("qhead").innerHTML='<span class="pill '+q.diff+'">'+q.diff+'</span><span class="pill">'+q.topic+'</span><span class="qtimer" id="qtimerMain">00:00</span><span class="cleared '+(solved.has(i)?"show":"")+'" id="clearedStamp">cleared</span>';
+  document.getElementById("qhead").innerHTML='<span class="pill '+q.diff+'">'+q.diff+'</span><span class="pill">'+q.topic+'</span><span class="pill est" id="estBadge">'+estimateLabel(q.diff)+'</span><span class="qtimer" id="qtimerMain">00:00</span><span class="cleared '+(solved.has(i)?"show":"")+'" id="clearedStamp">cleared</span>';
   startQuestionTimer(q.diff);
   document.getElementById("askText").textContent=q.ask;
   document.getElementById("sql").value=savedQueries[q.id]||"";
@@ -159,6 +159,12 @@ initTrainerSelect();
 window.addEventListener("scroll",()=>{
   document.body.classList.toggle("scrolled",window.scrollY>30);
 },{passive:true});
+
+if(window.visualViewport){
+  window.visualViewport.addEventListener("resize",()=>{
+    document.body.classList.toggle("scrolled",window.scrollY>30);
+  });
+}
 
 Promise.all([
   initSqlJs({locateFile:f=>"https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/"+f}),
