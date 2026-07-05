@@ -303,12 +303,13 @@ function initShellLayout(){
   function moveEditor(toRight){
     const ask=document.getElementById("ask");
     const promptBox=document.getElementById("promptBox");
+    const cluesBox=document.getElementById("cluesBox");
     const editor=document.querySelector(".editor-wrap");
     const actions=document.querySelector(".actions");
     const explainBox=document.getElementById("explainBox");
     const verdict=document.getElementById("verdict");
     const schema=document.getElementById("schema");
-    const order=[ask,promptBox,editor,actions];
+    const order=[ask,promptBox,cluesBox,editor,actions];
     if(toRight){
       order.forEach(el=>{if(el)right.appendChild(el);});
       if(explainBox)right.appendChild(explainBox);
