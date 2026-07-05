@@ -19,8 +19,10 @@ const SYSTEM_PROMPT =
   "step by step, at the level of a bright undergraduate. Walk through the code " +
   "clause by clause (SQL) or line by line (Python/pandas), describing what the " +
   "intermediate result looks like after each step and why the approach fits the " +
-  "question. Use short numbered steps and plain text only - no markdown headers, " +
-  "no code fences, no bullet asterisks. Keep it under 400 words.";
+  "question. Format the response as clean Markdown: use a numbered list for the " +
+  "steps, put any SQL/Python snippets in fenced code blocks with the language " +
+  "tag, and wrap column names, table names, and identifiers in backticks. Do not " +
+  "use headers. Keep it under 400 words.";
 
 function json(body, status) {
   return new Response(JSON.stringify(body), {
