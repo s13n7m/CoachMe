@@ -189,6 +189,12 @@
   .lesson-sql{margin:10px 0 14px;border:1px solid var(--line);border-radius:8px;background:#00264f;overflow:auto;}
   .lesson-sql pre{margin:0;padding:12px 14px;font-family:var(--mono);font-size:13px;line-height:1.55;color:#dcebfa;white-space:pre;}
 
+  .explainbox{margin-top:16px;border:1px solid var(--line);border-radius:8px;background:var(--panel);}
+  .explainbox .lbl{padding:8px 12px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11.5px;color:var(--muted);}
+  #explainText{padding:12px 14px;font-size:14px;color:var(--lesson-text);white-space:pre-wrap;line-height:1.6;}
+  .explain-model{font-family:var(--sans);font-size:13px;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:8px 12px;cursor:pointer;touch-action:manipulation;}
+  .explain-model:hover{border-color:var(--pp-sky);}
+
   .schema-toggle{background:none;border:1px solid #0a4a9e;color:#9fc4e8;border-radius:6px;font-size:12px;padding:5px 10px;cursor:pointer;font-family:var(--mono);touch-action:manipulation;}
   .schema{margin-top:26px;border-top:1px solid var(--line);padding-top:18px;}
   .tables{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;}

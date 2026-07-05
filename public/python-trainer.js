@@ -35,12 +35,13 @@ function buildMain(){
     +'<div class="ask" id="ask"><span class="albl">How it comes up in the interview</span><span class="atext" id="askText"></span></div>'
     +'<div class="promptbox collapsed" id="promptBox"><div class="prompt-head" id="promptHead"><span class="plbl">Write the code</span><span class="chev" id="promptChev">show</span></div><p class="prompt" id="prompt"><span id="promptText"></span></p><p class="hint" id="hint"></p></div>'
     +'<div class="editor-wrap"><div class="editor-bar"><span id="editorLabel">answer.py</span><button class="schema-toggle" id="schemaBtn">view tables</button></div><textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea></div>'
-    +'<div class="actions"><button class="act run" id="runBtn">Run and check</button><button class="act" id="solBtn">Show solution</button><button class="act" id="resetBtn">Clear</button><button class="act" id="prevBtn">&larr; Previous</button><button class="act" id="nextBtn">Next &rarr;</button><span class="kbd">Cmd / Ctrl + Enter &middot; Shift + &larr;/&rarr;</span></div>'
+    +'<div class="actions"><button class="act run" id="runBtn">Run and check</button><button class="act" id="solBtn">Show solution</button><button class="act" id="explainBtn">Explain solution</button><button class="act" id="explainWrongBtn" style="display:none">Explain my error</button><select id="explainModel" class="explain-model"><option value="sonnet">Sonnet 5</option><option value="haiku">Haiku 4.5</option></select><button class="act" id="resetBtn">Clear</button><button class="act" id="prevBtn">&larr; Previous</button><button class="act" id="nextBtn">Next &rarr;</button><span class="kbd">Cmd / Ctrl + Enter &middot; Shift + &larr;/&rarr;</span></div>'
     +'<div class="verdict" id="verdict"><span class="ic" id="vic"></span><span id="vmsg"></span></div>'
     +'<div class="stdoutbox" id="stdoutBox" style="display:none"><div class="lbl">Console output</div><pre id="stdoutText"></pre></div>'
     +'<div class="stdoutbox" id="varsBox" style="display:none"><div class="lbl">Your variables</div><div id="varsText"></div></div>'
     +'<div class="results" id="resultsBox" style="display:none"><h3>Your result</h3><div class="tablescroll" id="tableScroll"></div><div class="rowcount" id="rowCount"></div></div>'
     +'<div class="solution" id="solution"><div class="lbl">One correct solution (there are often several)</div><pre id="solText"></pre></div>'
+    +'<div class="explainbox" id="explainBox" style="display:none"><div class="lbl">Claude explains</div><div id="explainText"></div></div>'
     +'<div class="schema" id="schema"></div></main>';
 }
 
@@ -91,6 +92,8 @@ function loadQuestion(i){
   document.getElementById("varsBox").style.display="none";
   document.getElementById("resultsBox").style.display="none";
   document.getElementById("solution").className="solution";
+  document.getElementById("explainBox").style.display="none";
+  setExplainWrongVisible(false);
   document.getElementById("solText").textContent=q.solution;
   const reqLen=topicRequiredIndices(q.topic).length;setReadystrip(q.topic,topicDone(q.topic),reqLen);
   document.querySelectorAll(".qbtn").forEach(b=>b.classList.toggle("active",+b.dataset.i===i));
@@ -136,11 +139,13 @@ async function doRun(){
   if(g.error){
     verdict.className="verdict no";vic.textContent="!";vmsg.textContent="Python error: "+g.error;
     resultsBox.style.display="none";
+    setExplainWrongVisible(true);
     return;
   }
   if(g.no_result){
     verdict.className="verdict no";vic.textContent="?";vmsg.textContent=g.msg;
     resultsBox.style.display="none";
+    setExplainWrongVisible(true);
     if(g.vars && g.vars.length){
       varsBox.style.display="block";
       document.getElementById("varsText").innerHTML=g.vars.map(v=>
@@ -156,6 +161,7 @@ async function doRun(){
   if(g.ok){verdict.className="verdict ok";vic.textContent="\u2713";vmsg.textContent=g.msg;markSolved(current);savedQueries[q.id]=code;}
   else{verdict.className="verdict no";vic.textContent="\u2717";vmsg.textContent=g.msg;}
   logAttempt(q.id,code,g.ok);
+  setExplainWrongVisible(!g.ok);
 }
 
 let supabaseClient=null, currentUser=null, startIndex=0;
@@ -204,6 +210,28 @@ function hydrateProgress(){
     });
 }
 
+async function runExplain(kind){
+  const q=QUESTIONS[current];
+  const btn=document.getElementById(kind==="solution"?"explainBtn":"explainWrongBtn");
+  const box=document.getElementById("explainBox");
+  const txt=document.getElementById("explainText");
+  const orig=btn.textContent;
+  btn.disabled=true;btn.textContent="Thinking...";
+  try{
+    const payload={track:"python",mode:"trainer",questionId:q.id,kind,ask:q.ask,prompt:q.prompt||"",solution:q.solution,model:getExplainModel()};
+    if(kind==="attempt")payload.userCode=document.getElementById("sql").value;
+    const r=await requestExplanation(payload);
+    box.style.display="block";
+    txt.textContent=r.content;
+    box.scrollIntoView({behavior:"smooth",block:"nearest"});
+  }catch(e){
+    box.style.display="block";
+    txt.textContent=e.message;
+  }finally{
+    btn.disabled=false;btn.textContent=orig;
+  }
+}
+
 function logAttempt(questionId,queryText,passed){
   if(!supabaseClient||!currentUser) return;
   supabaseClient.from("attempts").insert({question_id:questionId,query_text:queryText,passed,mode:"trainer",track:"python"}).then(()=>{});
@@ -241,6 +269,9 @@ Promise.all([
   document.getElementById("totalCount").textContent=requiredCount();
   document.querySelectorAll(".qbtn").forEach(b=>b.addEventListener("click",()=>loadQuestion(+b.dataset.i)));
   document.getElementById("runBtn").addEventListener("click",doRun);
+  document.getElementById("explainBtn").addEventListener("click",()=>runExplain("solution"));
+  document.getElementById("explainWrongBtn").addEventListener("click",()=>runExplain("attempt"));
+  initExplainModelSelect();
   document.getElementById("solBtn").addEventListener("click",()=>document.getElementById("solution").classList.toggle("show"));
   document.getElementById("resetBtn").addEventListener("click",()=>{document.getElementById("sql").value="";document.getElementById("sql").focus();});
   document.getElementById("schemaBtn").addEventListener("click",()=>document.getElementById("schema").scrollIntoView({behavior:"smooth"}));

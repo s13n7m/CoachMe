@@ -108,3 +108,29 @@ function renderQuestionTimer(diff){
     el.className=cls+(id==="qtimerScrolled"?" qtimer-scrolled":"");
   });
 }
+
+async function requestExplanation(payload){
+  const {data:{session}}=await supabaseClient.auth.getSession();
+  if(!session) throw new Error("Sign in to use explanations.");
+  const res=await fetch("/api/explain",{
+    method:"POST",
+    headers:{"content-type":"application/json","authorization":"Bearer "+session.access_token},
+    body:JSON.stringify(payload)
+  });
+  const j=await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(j.error||"Explanation failed - try again.");
+  return j;
+}
+function getExplainModel(){
+  return localStorage.getItem("explainModel")||"sonnet";
+}
+function initExplainModelSelect(){
+  const sel=document.getElementById("explainModel");
+  if(!sel) return;
+  sel.value=getExplainModel();
+  sel.addEventListener("change",()=>localStorage.setItem("explainModel",sel.value));
+}
+function setExplainWrongVisible(show){
+  const btn=document.getElementById("explainWrongBtn");
+  if(btn) btn.style.display=show?"":"none";
+}
