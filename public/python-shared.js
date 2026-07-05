@@ -188,17 +188,20 @@ function initShellLayout(){
   const mq=window.matchMedia("(min-width:861px)");
 
   function moveEditor(toRight){
+    const ask=document.getElementById("ask");
+    const promptBox=document.getElementById("promptBox");
     const editor=document.querySelector(".editor-wrap");
     const actions=document.querySelector(".actions");
     const verdict=document.getElementById("verdict");
+    const order=[ask,promptBox,editor,actions];
     if(toRight){
-      if(editor)right.appendChild(editor);
-      if(actions)right.appendChild(actions);
+      order.forEach(el=>{if(el)right.appendChild(el);});
     }else{
-      if(editor&&verdict)main.insertBefore(editor,verdict);
-      else if(editor)main.appendChild(editor);
-      if(actions&&verdict)main.insertBefore(actions,verdict);
-      else if(actions)main.appendChild(actions);
+      order.forEach(el=>{
+        if(!el) return;
+        if(verdict) main.insertBefore(el,verdict);
+        else main.appendChild(el);
+      });
     }
   }
 

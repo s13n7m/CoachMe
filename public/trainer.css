@@ -277,6 +277,8 @@
     .wrap.sidebar-collapsed .right-col .editor-wrap{flex:0 0 auto;}
     .wrap.sidebar-collapsed .right-col textarea#sql{height:66vh;min-height:66vh;}
     .wrap.sidebar-collapsed .right-col .actions{margin:0;}
+    .wrap.sidebar-collapsed .right-col .ask,
+    .wrap.sidebar-collapsed .right-col .promptbox{margin-bottom:0;}
   }
 
   @media (max-width:860px){
