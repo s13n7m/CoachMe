@@ -38,6 +38,7 @@ function buildMain(){
     +'<div class="actions"><button class="act run" id="runBtn">Run and check</button><button class="act" id="solBtn">Show solution</button><button class="act" id="resetBtn">Clear</button><button class="act" id="prevBtn">&larr; Previous</button><button class="act" id="nextBtn">Next &rarr;</button><span class="kbd">Cmd / Ctrl + Enter &middot; Shift + &larr;/&rarr;</span></div>'
     +'<div class="verdict" id="verdict"><span class="ic" id="vic"></span><span id="vmsg"></span></div>'
     +'<div class="stdoutbox" id="stdoutBox" style="display:none"><div class="lbl">Console output</div><pre id="stdoutText"></pre></div>'
+    +'<div class="stdoutbox" id="varsBox" style="display:none"><div class="lbl">Your variables</div><div id="varsText"></div></div>'
     +'<div class="results" id="resultsBox" style="display:none"><h3>Your result</h3><div class="tablescroll" id="tableScroll"></div><div class="rowcount" id="rowCount"></div></div>'
     +'<div class="solution" id="solution"><div class="lbl">One correct solution (there are often several)</div><pre id="solText"></pre></div>'
     +'<div class="schema" id="schema"></div></main>';
@@ -86,6 +87,7 @@ function loadQuestion(i){
   document.getElementById("sql").value=savedQueries[q.id]||"";
   document.getElementById("verdict").className="verdict";
   document.getElementById("stdoutBox").style.display="none";
+  document.getElementById("varsBox").style.display="none";
   document.getElementById("resultsBox").style.display="none";
   document.getElementById("solution").className="solution";
   document.getElementById("solText").textContent=q.solution;
@@ -128,15 +130,28 @@ async function doRun(){
   }else{
     stdoutBox.style.display="none";
   }
+  const varsBox=document.getElementById("varsBox");
+  varsBox.style.display="none";
   if(g.error){
     verdict.className="verdict no";vic.textContent="!";vmsg.textContent="Python error: "+g.error;
     resultsBox.style.display="none";
     return;
   }
+  if(g.no_result){
+    verdict.className="verdict no";vic.textContent="?";vmsg.textContent=g.msg;
+    resultsBox.style.display="none";
+    if(g.vars && g.vars.length){
+      varsBox.style.display="block";
+      document.getElementById("varsText").innerHTML=g.vars.map(v=>
+        '<div style="margin-bottom:6px"><b>'+v.name+'</b> <span style="color:var(--muted)">('+v.type+')</span><br>'+v.preview+'</div>'
+      ).join("");
+    }
+    return;
+  }
   resultsBox.style.display="block";
   document.getElementById("tableScroll").innerHTML=renderPyTable(g);
   const n=g.rowcount;
-  document.getElementById("rowCount").textContent=n+" row"+(n===1?"":"s")+" returned"+(n>200?" (showing first 200)":"");
+  document.getElementById("rowCount").textContent=n+" row"+(n===1?"":"s")+" returned"+(n>200?" (showing first 200)":"")+(g.source==="last_expression"?" (read from the last line of your code)":"");
   if(g.ok){verdict.className="verdict ok";vic.textContent="\u2713";vmsg.textContent=g.msg;markSolved(current);savedQueries[q.id]=code;}
   else{verdict.className="verdict no";vic.textContent="\u2717";vmsg.textContent=g.msg;}
   logAttempt(q.id,code,g.ok);
