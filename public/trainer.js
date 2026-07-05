@@ -97,7 +97,7 @@ function loadQuestion(i){
   document.getElementById("solution").className="solution";
   document.getElementById("explainBox").style.display="none";
   setExplainWrongVisible(false);
-  document.getElementById("solText").textContent=q.solution;
+  document.getElementById("solText").textContent=formatSQL(q.solution);
   const reqLen=topicRequiredIndices(q.topic).length;setReadystrip(q.topic,topicDone(q.topic),reqLen);
   document.querySelectorAll(".qbtn").forEach(b=>b.classList.toggle("active",+b.dataset.i===i));
   document.getElementById("prevBtn").disabled=(i===0);

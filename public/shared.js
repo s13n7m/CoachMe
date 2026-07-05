@@ -167,6 +167,125 @@ function renderMarkdown(raw){
   return html||"<p></p>";
 }
 
+function formatSQL(sql){
+  if(!sql) return "";
+  const TWO_WORD=["GROUP BY","ORDER BY","UNION ALL","INNER JOIN","LEFT JOIN","RIGHT JOIN","FULL JOIN","CROSS JOIN","PARTITION BY","IS NOT","NOT NULL","NOT IN"];
+  const THREE_WORD=["LEFT OUTER JOIN","RIGHT OUTER JOIN","FULL OUTER JOIN"];
+  const CLAUSE=new Set(["SELECT","FROM","WHERE","GROUP BY","HAVING","ORDER BY","LIMIT","OFFSET","WITH","UNION ALL","UNION"]);
+  const JOINK=new Set(["JOIN","INNER JOIN","LEFT JOIN","RIGHT JOIN","FULL JOIN","CROSS JOIN","LEFT OUTER JOIN","RIGHT OUTER JOIN","FULL OUTER JOIN"]);
+  const SPACE_BEFORE_PAREN=new Set(["IN","NOT IN","EXISTS","AS","VALUES","WHERE","AND","OR","ON","SELECT","FROM","CASE","WHEN","THEN","ELSE","NOT","GROUP BY","ORDER BY","HAVING","UNION","UNION ALL","WITH","PARTITION BY","DISTINCT","LIMIT","OFFSET","BETWEEN","OVER",","]);
+
+  const raw=[];
+  const re=/'[^']*'|<=|>=|<>|!=|[=<>]|\(|\)|,|;|\s+|[^\s(),;'=<>]+/g;
+  let m;
+  while((m=re.exec(sql))){ if(!/^\s+$/.test(m[0])) raw.push(m[0]); }
+
+  const tokens=[];
+  for(let i=0;i<raw.length;i++){
+    const three=i+2<raw.length ? (raw[i]+" "+raw[i+1]+" "+raw[i+2]).toUpperCase() : null;
+    const two=i+1<raw.length ? (raw[i]+" "+raw[i+1]).toUpperCase() : null;
+    if(three && THREE_WORD.includes(three)){ tokens.push(raw[i]+" "+raw[i+1]+" "+raw[i+2]); i+=2; continue; }
+    if(two && TWO_WORD.includes(two)){ tokens.push(raw[i]+" "+raw[i+1]); i+=1; continue; }
+    tokens.push(raw[i]);
+  }
+
+  let out="",depth=0,clauseDepth=-1,currentClause=null,condDepth=-1;
+  const contextStack=[];
+  const caseStack=[];
+  function isStatementContext(){
+    if(depth===0) return true;
+    return contextStack[depth-1]===true;
+  }
+  function indentStr(d){return "  ".repeat(Math.max(d,0));}
+  function newline(d){
+    out=out.replace(/[ \t]+$/,"");
+    out+="\n"+indentStr(d);
+  }
+  function append(tok,spaceBefore){
+    if(spaceBefore && out.length && !out.endsWith("\n") && !out.endsWith(" ") && !out.endsWith("(")) out+=" ";
+    out+=tok;
+  }
+
+  for(let i=0;i<tokens.length;i++){
+    const tok=tokens[i];
+    const up=tok.toUpperCase();
+    if(tok===";"){ append(tok,false); continue; }
+    if(tok===","){
+      if(currentClause && ["SELECT","GROUP BY","ORDER BY"].includes(currentClause) && depth===clauseDepth && isStatementContext()){
+        append(",",false);
+        newline(depth+1);
+      } else {
+        append(",",false);
+      }
+      continue;
+    }
+    if(tok==="("){
+      const prevUp=i>0?tokens[i-1].toUpperCase():"";
+      const spaceBeforeParen=SPACE_BEFORE_PAREN.has(prevUp) || i===0;
+      const next=tokens[i+1]?tokens[i+1].toUpperCase():"";
+      const isSub = next==="SELECT" || next==="WITH";
+      append("(",spaceBeforeParen);
+      contextStack.push(isSub);
+      depth++;
+      continue;
+    }
+    if(tok===")"){
+      const wasSub=contextStack.pop();
+      depth=Math.max(depth-1,0);
+      if(wasSub){ newline(depth); append(")",false); }
+      else { append(")",false); }
+      continue;
+    }
+    if(up==="CASE"){
+      caseStack.push(depth);
+      append(tok,true);
+      continue;
+    }
+    if(up==="WHEN"){
+      newline((caseStack.length?caseStack[caseStack.length-1]:depth)+1);
+      append(tok,false);
+      continue;
+    }
+    if(up==="ELSE"){
+      newline((caseStack.length?caseStack[caseStack.length-1]:depth)+1);
+      append(tok,false);
+      continue;
+    }
+    if(up==="END"){
+      const cd=caseStack.pop();
+      newline(cd!==undefined?cd:depth);
+      append(tok,false);
+      continue;
+    }
+    if(CLAUSE.has(up) && isStatementContext()){
+      newline(depth);
+      append(tok,false);
+      clauseDepth=depth;
+      currentClause=up;
+      if(up==="WHERE"||up==="HAVING") condDepth=depth;
+      continue;
+    }
+    if(JOINK.has(up) && isStatementContext()){
+      newline(depth);
+      append(tok,false);
+      currentClause="FROM";
+      continue;
+    }
+    if(up==="ON" && isStatementContext()){
+      append(tok,true);
+      condDepth=depth;
+      continue;
+    }
+    if((up==="AND"||up==="OR") && depth===condDepth && isStatementContext()){
+      newline(depth+1);
+      append(tok,false);
+      continue;
+    }
+    append(tok,true);
+  }
+  return out.replace(/^\n+/,"").trimEnd();
+}
+
 function initShellLayout(){
   const wrap=document.querySelector(".wrap");
   const aside=document.getElementById("sidebar");
