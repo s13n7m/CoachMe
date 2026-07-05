@@ -115,12 +115,14 @@ function requireAuth(){
   });
 }
 
+const REQUIRED_QUESTION_IDS=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,140,141,142,143,144,145];
+
 function checkUnlocked(){
-  return supabaseClient.from("attempts").select("question_id").eq("mode","trainer").eq("track","sql").eq("passed",true).lt("question_id",60)
+  return supabaseClient.from("attempts").select("question_id").eq("mode","trainer").eq("track","sql").eq("passed",true).in("question_id",REQUIRED_QUESTION_IDS)
     .then(({data,error})=>{
       if(error||!data) return false;
       const distinct=new Set(data.map(r=>r.question_id));
-      return distinct.size>=60;
+      return distinct.size>=REQUIRED_QUESTION_IDS.length;
     });
 }
 
@@ -144,7 +146,7 @@ function showLocked(){
   document.getElementById("app").className="";
   document.getElementById("app").innerHTML='<div class="loading" style="max-width:520px;margin:40px auto;text-align:center;">'
     +'<h2 style="color:var(--pp-navy);margin:0 0 10px;">Quiz locked</h2>'
-    +'<p style="color:var(--muted);font-family:var(--sans);font-size:14px;">Clear all 60 trainer questions first to unlock the certification quiz.</p>'
+    +'<p style="color:var(--muted);font-family:var(--sans);font-size:14px;">Clear all '+REQUIRED_QUESTION_IDS.length+' trainer questions first to unlock the certification quiz.</p>'
     +'<a href="/" style="display:inline-block;margin-top:14px;background:var(--pp-blue);color:#fff;border-radius:99px;padding:10px 20px;text-decoration:none;font-family:var(--sans);font-size:14px;font-weight:600;">Back to Trainer</a>'
     +'</div>';
 }
