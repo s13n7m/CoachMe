@@ -143,7 +143,7 @@ export async function POST(req) {
 
     if (kind === "attempt") {
         userMessage +=
-            "\n\nThe student's attempt (which did NOT pass):\n" + userCode +
+            "\n\nThe candidate's attempt (which did NOT pass):\n" + userCode +
             "\n\nIdentify specifically where the attempt diverges from a correct approach and how to fix it, then briefly walk through the corrected reasoning.";
     } else {
         userMessage += "\n\nExplain this solution schematically, step by step. Be concise but keep all relevant information clear.";

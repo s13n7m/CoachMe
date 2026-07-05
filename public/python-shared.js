@@ -172,7 +172,7 @@ function renderMarkdown(raw){
       return;
     }
     if(inCode){codeBuf.push(line);return;}
-    if(!line.trim()){flushPara();flushList();return;}
+    if(!line.trim()){flushPara();return;}
     const h=line.match(/^(#{1,4})\s+(.*)/);
     if(h){flushPara();flushList();const lvl=Math.min(h[1].length+3,6);html+="<h"+lvl+">"+mdInline(h[2])+"</h"+lvl+">";return;}
     const ol=line.match(/^\s*\d+[.)]\s+(.*)/);
