@@ -78,14 +78,13 @@
   .qtimer.warn{background:var(--warn-dim);border-color:var(--warn-border);color:var(--warn-text);}
   .qtimer.over{background:var(--bad-dim);border-color:var(--bad-border);color:var(--bad-text);}
   .progress .qtimer-scrolled{display:none;order:4;}
-  .progress .sidebar-toggle-scrolled{display:none;order:5;width:26px;height:26px;padding:0;border-radius:99px;font-size:14px;align-items:center;justify-content:center;}
 
   body.scrolled .brand{display:none;}
   body.scrolled .sign-out-btn{display:none;}
   body.scrolled .header-actions{display:none;}
   body.scrolled header{padding:8px 16px;}
-  body.scrolled .progress .qtimer-scrolled{display:inline-block;}
-  body.scrolled .progress .sidebar-toggle-scrolled{display:inline-flex;}
+  body.scrolled .progress .qtimer-scrolled,
+  body.timer-offscreen .progress .qtimer-scrolled{display:inline-block;}
 
   .wrap{display:flex;align-items:stretch;min-height:calc(100vh - var(--header-h));min-height:calc(100dvh - var(--header-h));}
   aside{width:290px;flex:0 0 290px;border-right:1px solid var(--line);background:var(--panel);overflow-y:auto;max-height:calc(100vh - var(--header-h));max-height:calc(100dvh - var(--header-h));position:sticky;top:var(--header-h);}
@@ -237,21 +236,33 @@
 
   .sidebar-toggle{
     font-family:var(--sans);
-    font-size:12.5px;
-    font-weight:600;
+    font-size:16px;
+    font-weight:700;
     line-height:1;
-    white-space:nowrap;
     background:var(--panel);
     border:1px solid var(--line);
     border-radius:99px;
     color:var(--muted);
-    padding:9px 14px;
+    width:34px;
+    height:34px;
+    display:grid;
+    place-items:center;
     cursor:pointer;
     touch-action:manipulation;
+    position:fixed;
+    top:calc(var(--header-h) + 14px);
+    left:16px;
+    z-index:15;
+    box-shadow:0 1px 4px rgba(0,48,135,0.12);
+    transition:left .15s ease;
   }
   .sidebar-toggle:hover{color:var(--pp-blue);border-color:var(--pp-sky);}
 
-  .wrap.sidebar-collapsed aside{display:none;}
+  body.sidebar-collapsed aside{display:none;}
+
+  @media (min-width:861px){
+    body:not(.sidebar-collapsed) .sidebar-toggle{left:306px;}
+  }
 
   .col-resizer{display:none;}
 

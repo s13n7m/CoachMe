@@ -67,12 +67,24 @@ function syncHeaderHeight(){
 
 const QUESTION_TIME_BUDGET={easy:180,medium:360,hard:600};
 function estimateLabel(diff){return "~"+Math.round((QUESTION_TIME_BUDGET[diff]||360)/60)+" min";}
-let questionTimerInterval=null,questionTimerSeconds=0;
+let questionTimerInterval=null,questionTimerSeconds=0,qtimerObserver=null;
 function startQuestionTimer(diff){
   clearInterval(questionTimerInterval);
   questionTimerSeconds=0;
   renderQuestionTimer(diff);
   questionTimerInterval=setInterval(()=>{questionTimerSeconds++;renderQuestionTimer(diff);},1000);
+  observeTimerVisibility();
+}
+function observeTimerVisibility(){
+  if(qtimerObserver) qtimerObserver.disconnect();
+  const el=document.getElementById("qtimerMain");
+  if(!el||!("IntersectionObserver" in window)) return;
+  qtimerObserver=new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      document.body.classList.toggle("timer-offscreen",!entry.isIntersecting);
+    });
+  },{threshold:0});
+  qtimerObserver.observe(el);
 }
 function renderQuestionTimer(diff){
   const budget=QUESTION_TIME_BUDGET[diff]||360;
@@ -164,7 +176,6 @@ function initShellLayout(){
   if(!wrap||!aside||!main||!right) return;
 
   const toggle=document.getElementById("sidebarToggle");
-  const toggleScrolled=document.getElementById("sidebarToggleScrolled");
   if(!toggle) return;
 
   const mq=window.matchMedia("(min-width:861px)");
@@ -238,31 +249,25 @@ function initShellLayout(){
   }
 
   function apply(){
-    const collapsed=wrap.classList.contains("sidebar-collapsed");
-    const label=collapsed?"Show topic list":"Hide topic list";
-    toggle.textContent=collapsed?"› Show list":"‹ Hide list";
-    toggle.setAttribute("aria-label",label);
-    if(toggleScrolled){
-      toggleScrolled.textContent=collapsed?"›":"‹";
-      toggleScrolled.setAttribute("aria-label",label);
-    }
+    const collapsed=document.body.classList.contains("sidebar-collapsed");
+    toggle.textContent=collapsed?"›":"‹";
+    toggle.setAttribute("aria-label",collapsed?"Show topic list":"Hide topic list");
     moveEditor(mq.matches);
     applyColumnRatio();
     syncHeaderHeight();
   }
 
   function toggleSidebar(){
-    const collapsed=!wrap.classList.contains("sidebar-collapsed");
-    wrap.classList.toggle("sidebar-collapsed",collapsed);
+    const collapsed=!document.body.classList.contains("sidebar-collapsed");
+    document.body.classList.toggle("sidebar-collapsed",collapsed);
     localStorage.setItem("sidebarCollapsed",collapsed?"1":"0");
     apply();
   }
 
   toggle.addEventListener("click",toggleSidebar);
-  if(toggleScrolled) toggleScrolled.addEventListener("click",toggleSidebar);
   mq.addEventListener("change",apply);
   initResizer();
 
-  wrap.classList.toggle("sidebar-collapsed",localStorage.getItem("sidebarCollapsed")==="1");
+  document.body.classList.toggle("sidebar-collapsed",localStorage.getItem("sidebarCollapsed")==="1");
   apply();
 }

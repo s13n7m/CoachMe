@@ -14,7 +14,6 @@ function makeHeader({ tick, subtitle, quizHref, quizLabel, quizLocked, activeTra
     <small>${subtitle}</small>
   </div>
   <div class="header-actions">
-    <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Hide sidebar">&#8249; Hide list</button>
     <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">&#127769;</button>
     <a class="quiz-link${quizLocked ? " locked" : ""}" id="${quizLocked !== undefined ? "quizBtn" : "backBtn"}" href="${quizHref}">${quizLabel}</a>
   </div>
@@ -25,8 +24,8 @@ function makeHeader({ tick, subtitle, quizHref, quizLabel, quizLocked, activeTra
     <span class="ptotal"><span id="totalCount">0</span></span>
     <span class="pend"> cleared</span>
     <span class="qtimer qtimer-scrolled" id="qtimerScrolled">00:00</span>
-    <button class="sidebar-toggle sidebar-toggle-scrolled" id="sidebarToggleScrolled" type="button" aria-label="Hide sidebar">&#8249;</button>
   </div>
+  <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Hide topic list">&#8249;</button>
 `;
 }
 
