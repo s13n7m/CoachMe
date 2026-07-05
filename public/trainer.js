@@ -8,9 +8,9 @@ const savedQueries={};
 
 function topicIndices(topic){const out=[];QUESTIONS.forEach((q,i)=>{if(q.topic===topic)out.push(i);});return out;}
 function topicRequiredIndices(topic){return topicIndices(topic).filter(i=>!QUESTIONS[i].bonus);}
-function topicDone(topic){return topicRequiredIndices(topic).filter(i=>solved.has(i)).length;}
+function topicDone(topic){return topicRequiredIndices(topic).filter(i=>solved.has(QUESTIONS[i].id)).length;}
 function requiredCount(){return QUESTIONS.filter(q=>!q.bonus).length;}
-function requiredSolvedCount(){let n=0;solved.forEach(i=>{if(!QUESTIONS[i].bonus)n++;});return n;}
+function requiredSolvedCount(){let n=0;QUESTIONS.forEach(q=>{if(!q.bonus&&solved.has(q.id))n++;});return n;}
 
 function buildSidebar(){
   let html="";
@@ -21,7 +21,7 @@ function buildSidebar(){
     html+='<div class="topic-head"><span class="tname">'+(ti+1)+'. '+topic+'</span><span class="frac" id="frac-'+ti+'">'+topicDone(topic)+'/'+reqLen+'</span></div>';
     html+='<div class="tbar"><i id="tbar-'+ti+'" style="width:'+(topicDone(topic)/reqLen*100)+'%"></i></div><div class="pad">';
     idxs.forEach(i=>{
-      html+='<button class="qbtn'+(solved.has(i)?" done":"")+(QUESTIONS[i].bonus?" bonus":"")+'" data-i="'+i+'"><span class="dot">'+(solved.has(i)?"\u2713":"")+'</span><span class="lbl">'+QUESTIONS[i].prompt.slice(0,40)+(QUESTIONS[i].prompt.length>40?"...":"")+'</span></button>';
+      html+='<button class="qbtn'+(solved.has(QUESTIONS[i].id)?" done":"")+(QUESTIONS[i].bonus?" bonus":"")+'" data-i="'+i+'"><span class="dot">'+(solved.has(QUESTIONS[i].id)?"\u2713":"")+'</span><span class="lbl">'+QUESTIONS[i].prompt.slice(0,40)+(QUESTIONS[i].prompt.length>40?"...":"")+'</span></button>';
     });
     html+='</div></div>';
   });
@@ -82,7 +82,7 @@ function updateQuizGate(done,total){
 function loadQuestion(i){
   current=i;const q=QUESTIONS[i];
   document.getElementById("qtick").textContent="Q"+(i+1);
-  document.getElementById("qhead").innerHTML='<span class="pill '+q.diff+'">'+q.diff+'</span><span class="pill">'+q.topic+'</span><span class="pill est" id="estBadge">'+estimateLabel(q.diff)+'</span><span class="qtimer" id="qtimerMain">00:00</span><span class="cleared '+(solved.has(i)?"show":"")+'" id="clearedStamp">cleared</span>';
+  document.getElementById("qhead").innerHTML='<span class="pill '+q.diff+'">'+q.diff+'</span><span class="pill">'+q.topic+'</span><span class="pill est" id="estBadge">'+estimateLabel(q.diff)+'</span><span class="qtimer" id="qtimerMain">00:00</span><span class="cleared '+(solved.has(q.id)?"show":"")+'" id="clearedStamp">cleared</span>';
   startQuestionTimer(q.diff);
   const lessonContent=(typeof LESSONS[q.topic]==="object")?LESSONS[q.topic][q.subtopic]:LESSONS[q.topic];
   document.getElementById("lessonBody").innerHTML=lessonContent;
@@ -110,8 +110,9 @@ function goToQuestion(delta){
   if(next>=0 && next<QUESTIONS.length) loadQuestion(next);
 }
 function markSolved(i){
-  if(!solved.has(i)){
-    solved.add(i);
+  const id=QUESTIONS[i].id;
+  if(!solved.has(id)){
+    solved.add(id);
     const btn=document.querySelector('.qbtn[data-i="'+i+'"]');
     if(btn){btn.classList.add("done");btn.querySelector(".dot").textContent="\u2713";}
     const st=document.getElementById("clearedStamp");if(st)st.classList.add("show");

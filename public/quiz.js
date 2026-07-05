@@ -8,7 +8,7 @@ let startIndex=0;
 function buildSidebar(){
   let html="";
   QUIZ_QUESTIONS.forEach((q,i)=>{
-    html+='<button class="qbtn'+(solved.has(i)?" done":"")+'" data-i="'+i+'"><span class="dot">'+(solved.has(i)?"✓":"")+'</span><span class="lbl">'+(i+1)+'. '+q.topic+'</span></button>';
+    html+='<button class="qbtn'+(solved.has(q.id)?" done":"")+'" data-i="'+i+'"><span class="dot">'+(solved.has(q.id)?"✓":"")+'</span><span class="lbl">'+(i+1)+'. '+q.topic+'</span></button>';
   });
   return html;
 }
@@ -32,7 +32,7 @@ function updateProgress(){
 
 function loadQuestion(i){
   current=i;const q=QUIZ_QUESTIONS[i];
-  document.getElementById("qhead").innerHTML='<span class="pill '+q.diff+'">'+q.diff+'</span><span class="pill">'+q.topic+'</span><span class="pill est" id="estBadge">'+estimateLabel(q.diff)+'</span><span class="qtimer" id="qtimerMain">00:00</span><span class="cleared '+(solved.has(i)?"show":"")+'" id="clearedStamp">cleared</span>';
+  document.getElementById("qhead").innerHTML='<span class="pill '+q.diff+'">'+q.diff+'</span><span class="pill">'+q.topic+'</span><span class="pill est" id="estBadge">'+estimateLabel(q.diff)+'</span><span class="qtimer" id="qtimerMain">00:00</span><span class="cleared '+(solved.has(q.id)?"show":"")+'" id="clearedStamp">cleared</span>';
   startQuestionTimer(q.diff);
   document.getElementById("askText").textContent=q.ask;
   document.getElementById("sql").value=savedQueries[q.id]||"";
@@ -53,8 +53,9 @@ function goToQuestion(delta){
   if(next>=0 && next<QUIZ_QUESTIONS.length) loadQuestion(next);
 }
 function markSolved(i){
-  if(!solved.has(i)){
-    solved.add(i);
+  const id=QUIZ_QUESTIONS[i].id;
+  if(!solved.has(id)){
+    solved.add(id);
     const btn=document.querySelector('.qbtn[data-i="'+i+'"]');
     if(btn){btn.classList.add("done");btn.querySelector(".dot").textContent="✓";}
     const st=document.getElementById("clearedStamp");if(st)st.classList.add("show");
