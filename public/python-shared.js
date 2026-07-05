@@ -182,14 +182,8 @@ function initShellLayout(){
   const right=document.getElementById("rightCol");
   if(!wrap||!aside||!main||!right) return;
 
-  let toggle=document.getElementById("sidebarToggle");
-  if(!toggle){
-    toggle=document.createElement("button");
-    toggle.id="sidebarToggle";
-    toggle.className="sidebar-toggle";
-    toggle.type="button";
-    wrap.insertBefore(toggle,main);
-  }
+  const toggle=document.getElementById("sidebarToggle");
+  if(!toggle) return;
 
   const mq=window.matchMedia("(min-width:861px)");
 
@@ -210,7 +204,7 @@ function initShellLayout(){
 
   function apply(){
     const collapsed=wrap.classList.contains("sidebar-collapsed");
-    toggle.textContent=collapsed?"›":"‹";
+    toggle.textContent=collapsed?"› Show list":"‹ Hide list";
     toggle.setAttribute("aria-label",collapsed?"Show topic list":"Hide topic list");
     moveEditor(collapsed&&mq.matches);
     syncHeaderHeight();
