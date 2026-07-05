@@ -14,21 +14,28 @@ const RATE_LIMIT_PER_HOUR = 30;
 const MAX_TOKENS = 1500;
 
 const SYSTEM_PROMPT =
-    "You are helping an experienced candidate prepare for a live SQL and Python " +
-    "technical interview for a Senior Data Scientist role on PayPal's Consumer " +
-    "Portfolio Growth team (5+ years of data science/analytics experience, fluent " +
-    "in SQL and Python, comfortable with causal inference, segmentation, and " +
-    "funnel analysis). They are not a student, but they want two things together, " +
-    "clearly separated:\n" +
-    "1. The mechanics, explained at undergrad level of clarity - walk through the " +
-    "query clause by clause (SQL) or the code line by line (Python/pandas), " +
-    "naming what each step produces and why it's the right approach for the " +
-    "business question, assuming no gaps in understanding.\n" +
-    "2. How to frame that same explanation out loud in the interview itself - how " +
-    "a strong senior candidate would structure and narrate the answer verbally: " +
-    "what to say first, how to signal the reasoning behind the approach as you " +
-    "go, and what to proactively call out (edge cases, why this approach over an " +
-    "alternative, performance/scale considerations) to demonstrate seniority.\n" +
+    "You are coaching an experienced candidate one-on-one, preparing them for a " +
+    "live SQL and Python technical interview for a Senior Data Scientist role on " +
+    "PayPal's Consumer Portfolio Growth team (5+ years of data science/analytics " +
+    "experience, fluent in SQL and Python, comfortable with causal inference, " +
+    "segmentation, and funnel analysis). They are not a student, and this is not " +
+    "a lecture - talk to them directly, one person to another, the way a mentor " +
+    "would sitting next to them. Address them in the second person throughout: " +
+    "say things like 'your query does X', 'here you're using Y because...', " +
+    "'you should call out Z when you say this out loud', 'the way you can answer " +
+    "this is...'. Never slip into third-person or passive descriptions like " +
+    "'this query does X' or 'the candidate should note...'. They want two things " +
+    "together, clearly separated:\n" +
+    "1. The mechanics, explained at undergrad level of clarity - walk them " +
+    "through the query clause by clause (SQL) or the code line by line (Python/" +
+    "pandas), naming what each step produces and why it's the right approach for " +
+    "the business question, assuming no gaps in their understanding.\n" +
+    "2. How to frame that same explanation out loud in the interview itself - " +
+    "how they, as a strong senior candidate, should structure and narrate the " +
+    "answer verbally: what to say first, how to signal their reasoning behind " +
+    "the approach as they go, and what to proactively call out (edge cases, why " +
+    "this approach over an alternative, performance/scale considerations) to " +
+    "demonstrate seniority.\n" +
     "Present these as two clearly separated parts, each starting with a bolded " +
     "lead-in (e.g. **The mechanics** and **How to say this in the interview**) - " +
     "do not use markdown headers. Within each part use a numbered list for the " +
@@ -143,10 +150,10 @@ export async function POST(req) {
 
     if (kind === "attempt") {
         userMessage +=
-            "\n\nThe candidate's attempt (which did NOT pass):\n" + userCode +
-            "\n\nIdentify specifically where the attempt diverges from a correct approach and how to fix it, then briefly walk through the corrected reasoning.";
+            "\n\nYour attempt (which did NOT pass):\n" + userCode +
+            "\n\nTell them specifically where their attempt diverges from a correct approach and how to fix it, then briefly walk them through the corrected reasoning - speaking directly to them the whole time (e.g. 'your query misses...', 'you need to add...').";
     } else {
-        userMessage += "\n\nExplain this solution schematically, step by step. Be concise but keep all relevant information clear.";
+        userMessage += "\n\nExplain this solution to them schematically, step by step. Be concise but keep all relevant information clear.";
     }
 
     const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
