@@ -19,7 +19,7 @@ function buildSidebar(){
     const idxs=topicIndices(topic);
     const reqLen=topicRequiredIndices(topic).length;
     html+='<div class="topic" data-topic="'+ti+'">';
-    html+='<div class="topic-head"><span class="tname">'+(ti+1)+'. '+topic+'</span><span class="frac" id="frac-'+ti+'">'+topicDone(topic)+'/'+reqLen+'</span></div>';
+    html+='<div class="topic-head"><span class="tname">'+(ti+1)+'. '+topic+'</span><span class="frac" id="frac-'+ti+'">'+topicDone(topic)+'/'+reqLen+'</span><span class="topic-chev">hide</span></div>';
     html+='<div class="tbar"><i id="tbar-'+ti+'" style="width:'+(topicDone(topic)/reqLen*100)+'%"></i></div><div class="pad">';
     idxs.forEach(i=>{
       html+='<button class="qbtn'+(solved.has(QUESTIONS[i].id)?" done":"")+(QUESTIONS[i].bonus?" bonus":"")+'" data-i="'+i+'"><span class="dot">'+(solved.has(QUESTIONS[i].id)?"\u2713":"")+'</span><span class="star">'+(flagged.has(QUESTIONS[i].id)?"\u2605":"")+'</span><span class="lbl">'+QUESTIONS[i].prompt.slice(0,40)+(QUESTIONS[i].prompt.length>40?"...":"")+'</span></button>';
@@ -302,6 +302,7 @@ Promise.all([
   document.getElementById("explainWrongBtn").addEventListener("click",()=>runExplain("attempt"));
   initExplainModelSelect();
   initShellLayout();
+  initTopicCollapse("collapsedTopicsPython");
   document.getElementById("solBtn").addEventListener("click",()=>document.getElementById("solution").classList.toggle("show"));
   document.getElementById("resetBtn").addEventListener("click",()=>{document.getElementById("sql").value="";document.getElementById("sql").focus();});
   document.getElementById("schemaBtn").addEventListener("click",()=>document.getElementById("schema").scrollIntoView({behavior:"smooth"}));

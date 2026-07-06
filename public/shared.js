@@ -307,6 +307,33 @@ function formatSQL(sql){
   return out.replace(/^\n+/,"").trimEnd();
 }
 
+function initTopicCollapse(storageKey){
+  const sidebar=document.getElementById("sidebar");
+  if(!sidebar) return;
+  let collapsedSet;
+  try{ collapsedSet=new Set(JSON.parse(localStorage.getItem(storageKey)||"[]")); }
+  catch(e){ collapsedSet=new Set(); }
+  function apply(){
+    sidebar.querySelectorAll(".topic").forEach(el=>{
+      const ti=el.dataset.topic;
+      const isCollapsed=collapsedSet.has(ti);
+      el.classList.toggle("collapsed",isCollapsed);
+      const chev=el.querySelector(".topic-chev");
+      if(chev) chev.textContent=isCollapsed?"show":"hide";
+    });
+  }
+  sidebar.addEventListener("click",e=>{
+    const head=e.target.closest(".topic-head");
+    if(!head) return;
+    const topicEl=head.closest(".topic");
+    const ti=topicEl.dataset.topic;
+    if(collapsedSet.has(ti)) collapsedSet.delete(ti); else collapsedSet.add(ti);
+    localStorage.setItem(storageKey,JSON.stringify([...collapsedSet]));
+    apply();
+  });
+  apply();
+}
+
 function initShellLayout(){
   const wrap=document.querySelector(".wrap");
   const aside=document.getElementById("sidebar");
