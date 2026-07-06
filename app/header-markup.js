@@ -3,12 +3,14 @@ export const LOGO_SRC = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA4QAAADvB
 function makeHeader({ tick, subtitle, quizHref, quizLabel, quizLocked, activeTrack }) {
   const sqlSelected = activeTrack === "sql" ? " selected" : "";
   const pySelected = activeTrack === "python" ? " selected" : "";
+  const mlSelected = activeTrack === "ml" ? " selected" : "";
   return `
   <div class="brand">
     <img class="logo" src="${LOGO_SRC}" alt="PayPal">
     <select id="trainerSelect" class="trainer-select">
       <option value="/"${sqlSelected}>SQL Trainer</option>
       <option value="/python"${pySelected}>Python Trainer</option>
+      <option value="/ml"${mlSelected}>ML Fundamentals</option>
     </select>
     <span class="tick" id="qtick">${tick}</span>
     <small>${subtitle}</small>
@@ -63,4 +65,13 @@ export const PYTHON_QUIZ_HEADER_HTML = makeHeader({
   quizLabel: "&larr; Back to Trainer",
   quizLocked: undefined,
   activeTrack: "python",
+});
+
+export const ML_HEADER_HTML = makeHeader({
+  tick: "Q1",
+  subtitle: "Consumer Portfolio Growth &middot; Machine Learning Fundamentals discussion",
+  quizHref: "#",
+  quizLabel: "Quiz (soon)",
+  quizLocked: true,
+  activeTrack: "ml",
 });

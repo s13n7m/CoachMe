@@ -7,16 +7,17 @@ const ALLOWED_MODELS = {
 };
 const DEFAULT_MODEL = "sonnet";
 
-const TRACKS = ["sql", "python"];
+const TRACKS = ["sql", "python", "ml"];
 const MODES = ["trainer", "quiz"];
-const KINDS = ["solution", "attempt"];
+const KINDS = ["solution", "attempt", "grade"];
 const RATE_LIMIT_PER_HOUR = 30;
 const MAX_TOKENS = 1500;
 
 const SYSTEM_PROMPT =
-    "You are coaching an experienced candidate one-on-one, preparing them for a " +
-    "live SQL and Python technical interview for a Senior Data Scientist role on " +
-    "PayPal's Consumer Portfolio Growth team (5+ years of data science/analytics " +
+    "You are coaching an experienced candidate one-on-one, preparing them for " +
+    "interviews for a Senior/Staff Data Scientist role on PayPal's Consumer " +
+    "Portfolio Growth team - a live SQL/Python technical exercise and a separate " +
+    "Machine Learning Fundamentals discussion (5+ years of data science/analytics " +
     "experience, fluent in SQL and Python, comfortable with causal inference, " +
     "segmentation, and funnel analysis). They are not a student, and this is not " +
     "a lecture - talk to them directly, one person to another, the way a mentor " +
@@ -42,6 +43,24 @@ const SYSTEM_PROMPT =
     "steps, fenced code blocks with the language tag for any SQL/Python snippets, " +
     "and backticks around column names, table names, and identifiers. Keep the " +
     "combined response under 500 words.";
+
+const GRADE_SYSTEM_PROMPT =
+    "You are coaching an experienced candidate one-on-one, preparing them for " +
+    "PayPal's Consumer Portfolio Growth Machine Learning Fundamentals interview - " +
+    "a 30-minute live discussion, not a coding exercise. They are not a student - " +
+    "talk to them directly, one person to another, the way a mentor would. " +
+    "Address them in the second person throughout (e.g. 'you're missing...', " +
+    "'you correctly note...', 'you should also mention...'). You'll be given an " +
+    "interview question, a model answer covering the key points a strong answer " +
+    "should hit, and the candidate's own typed answer. Grade their answer: start " +
+    "with a one-line verdict in bold - **Strong**, **Needs work**, or **Off " +
+    "track** - then in a short paragraph or a few numbered points, tell them " +
+    "specifically what they got right and what's missing, vague, or incorrect " +
+    "compared to the model answer. Engage with what they actually wrote rather " +
+    "than reciting the model answer back at them - if they used different but " +
+    "equally valid terminology or examples, say so rather than marking it wrong. " +
+    "Keep it honest but encouraging. Format as clean Markdown (no headers), " +
+    "under 300 words.";
 
 function json(body, status) {
     return new Response(JSON.stringify(body), {
@@ -101,12 +120,16 @@ export async function POST(req) {
     const prompt = typeof body.prompt === "string" && body.prompt.length <= 1000 ? body.prompt : "";
     const solution = capped(body.solution, 4000);
     const userCode = kind === "attempt" ? capped(body.userCode, 4000) : null;
+    const studentAnswer = kind === "grade" ? capped(body.studentAnswer, 3000) : null;
 
     if (!track || !mode || !kind || questionId === null || !ask || !solution) {
         return json({ error: "Bad request." }, 400);
     }
     if (kind === "attempt" && !userCode) {
         return json({ error: "Run some code first, then ask what's wrong." }, 400);
+    }
+    if (kind === "grade" && !studentAnswer) {
+        return json({ error: "Write an answer first, then check it." }, 400);
     }
 
     // 3. Cache: solution explanations are generated once per question+model, ever.
@@ -140,18 +163,24 @@ export async function POST(req) {
     // 5. Build the fixed prompt and call Anthropic.
     const env = track === "sql" ?
         "Dialect: SQLite (running in-browser via sql.js)." :
-        "Environment: Python with pandas, numpy and scipy (running in-browser via Pyodide). Answers are assigned to a variable named result.";
+        track === "python" ?
+        "Environment: Python with pandas, numpy and scipy (running in-browser via Pyodide). Answers are assigned to a variable named result." :
+        "This is a conceptual Machine Learning Fundamentals discussion question, not a coding exercise.";
 
     let userMessage =
         env +
         "\n\nInterview question: " + ask +
         (prompt ? "\nTask spec: " + prompt : "") +
-        "\n\nOfficial solution:\n" + solution;
+        "\n\n" + (kind === "grade" ? "Model answer" : "Official solution") + ":\n" + solution;
 
     if (kind === "attempt") {
         userMessage +=
             "\n\nYour attempt (which did NOT pass):\n" + userCode +
             "\n\nTell them specifically where their attempt diverges from a correct approach and how to fix it, then briefly walk them through the corrected reasoning - speaking directly to them the whole time (e.g. 'your query misses...', 'you need to add...').";
+    } else if (kind === "grade") {
+        userMessage +=
+            "\n\nYour answer:\n" + studentAnswer +
+            "\n\nGrade this answer against the model answer above.";
     } else {
         userMessage += "\n\nExplain this solution to them schematically, step by step. Be concise but keep all relevant information clear.";
     }
@@ -166,7 +195,7 @@ export async function POST(req) {
         body: JSON.stringify({
             model,
             max_tokens: MAX_TOKENS,
-            system: SYSTEM_PROMPT,
+            system: kind === "grade" ? GRADE_SYSTEM_PROMPT : SYSTEM_PROMPT,
             messages: [{ role: "user", content: userMessage }],
         }),
     });
