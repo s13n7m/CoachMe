@@ -121,6 +121,27 @@ function renderQuestionTimer(diff){
   });
 }
 
+async function fetchFlaggedIds(track,mode){
+  const {data:{session}}=await supabaseClient.auth.getSession();
+  if(!session) return [];
+  const {data,error}=await supabaseClient.from("question_flags").select("question_id").eq("track",track).eq("mode",mode);
+  if(error||!data) return [];
+  return data.map(r=>r.question_id);
+}
+async function setQuestionFlag(track,mode,questionId,on){
+  const {data:{session}}=await supabaseClient.auth.getSession();
+  if(!session) return;
+  if(on){
+    await supabaseClient.from("question_flags").upsert(
+      {user_id:session.user.id,track,mode,question_id:questionId},
+      {onConflict:"user_id,track,mode,question_id"}
+    );
+  }else{
+    await supabaseClient.from("question_flags").delete()
+      .eq("track",track).eq("mode",mode).eq("question_id",questionId);
+  }
+}
+
 async function requestExplanation(payload){
   const {data:{session}}=await supabaseClient.auth.getSession();
   if(!session) throw new Error("Sign in to use explanations.");

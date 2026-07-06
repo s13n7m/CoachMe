@@ -4,6 +4,7 @@ const QUESTIONS = [{"id": 0, "topic": "SELECT and DISTINCT", "diff": "easy", "or
 
 let current=0;
 const solved=new Set();
+const flagged=new Set();
 const savedQueries={};
 
 function topicIndices(topic){const out=[];QUESTIONS.forEach((q,i)=>{if(q.topic===topic)out.push(i);});return out;}
@@ -21,7 +22,7 @@ function buildSidebar(){
     html+='<div class="topic-head"><span class="tname">'+(ti+1)+'. '+topic+'</span><span class="frac" id="frac-'+ti+'">'+topicDone(topic)+'/'+reqLen+'</span></div>';
     html+='<div class="tbar"><i id="tbar-'+ti+'" style="width:'+(topicDone(topic)/reqLen*100)+'%"></i></div><div class="pad">';
     idxs.forEach(i=>{
-      html+='<button class="qbtn'+(solved.has(QUESTIONS[i].id)?" done":"")+(QUESTIONS[i].bonus?" bonus":"")+'" data-i="'+i+'"><span class="dot">'+(solved.has(QUESTIONS[i].id)?"\u2713":"")+'</span><span class="lbl">'+QUESTIONS[i].prompt.slice(0,40)+(QUESTIONS[i].prompt.length>40?"...":"")+'</span></button>';
+      html+='<button class="qbtn'+(solved.has(QUESTIONS[i].id)?" done":"")+(QUESTIONS[i].bonus?" bonus":"")+'" data-i="'+i+'"><span class="dot">'+(solved.has(QUESTIONS[i].id)?"\u2713":"")+'</span><span class="star">'+(flagged.has(QUESTIONS[i].id)?"\u2605":"")+'</span><span class="lbl">'+QUESTIONS[i].prompt.slice(0,40)+(QUESTIONS[i].prompt.length>40?"...":"")+'</span></button>';
     });
     html+='</div></div>';
   });
@@ -82,7 +83,9 @@ function updateQuizGate(done,total){
 function loadQuestion(i){
   current=i;const q=QUESTIONS[i];
   document.getElementById("qtick").textContent="Q"+(i+1);
-  document.getElementById("qhead").innerHTML='<span class="pill '+q.diff+'">'+q.diff+'</span><span class="pill">'+q.topic+'</span><span class="pill est" id="estBadge">'+estimateLabel(q.diff)+'</span><span class="qtimer" id="qtimerMain">00:00</span><span class="cleared '+(solved.has(q.id)?"show":"")+'" id="clearedStamp">cleared</span>';
+  document.getElementById("qhead").innerHTML='<button class="star-toggle" id="starToggle" type="button" aria-label="Mark to come back to">☆</button><span class="pill '+q.diff+'">'+q.diff+'</span><span class="pill">'+q.topic+'</span><span class="pill est" id="estBadge">'+estimateLabel(q.diff)+'</span><span class="qtimer" id="qtimerMain">00:00</span><span class="cleared '+(solved.has(q.id)?"show":"")+'" id="clearedStamp">cleared</span>';
+  renderStar(q.id);
+  document.getElementById("starToggle").addEventListener("click",()=>toggleFlag(q.id));
   startQuestionTimer(q.diff);
   const lessonContent=(typeof LESSONS[q.topic]==="object")?LESSONS[q.topic][q.subtopic]:LESSONS[q.topic];
   document.getElementById("lessonBody").innerHTML=lessonContent;
@@ -192,6 +195,31 @@ function hydrateProgress(){
     });
 }
 
+function hydrateFlags(){
+  return fetchFlaggedIds("sql","trainer").then(ids=>ids.forEach(id=>flagged.add(id)));
+}
+
+function toggleFlag(id){
+  const on=!flagged.has(id);
+  if(on) flagged.add(id); else flagged.delete(id);
+  setQuestionFlag("sql","trainer",id,on);
+  renderStar(id);
+  const btn=document.querySelector('.qbtn[data-i="'+current+'"]');
+  if(btn){
+    const st=btn.querySelector(".star");
+    if(st) st.textContent=on?"★":"";
+  }
+}
+
+function renderStar(id){
+  const btn=document.getElementById("starToggle");
+  if(!btn) return;
+  const on=flagged.has(id);
+  btn.textContent=on?"★":"☆";
+  btn.classList.toggle("on",on);
+  btn.setAttribute("aria-label",on?"Marked to come back to":"Mark to come back to");
+}
+
 async function runExplain(kind){
   const q=QUESTIONS[current];
   const btn=document.getElementById(kind==="solution"?"explainBtn":"explainWrongBtn");
@@ -242,7 +270,7 @@ setTimeout(syncHeaderHeight,300);
 
 Promise.all([
   initSqlJs({locateFile:f=>"https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/"+f}),
-  requireAuth().then(hydrateProgress)
+  requireAuth().then(()=>Promise.all([hydrateProgress(),hydrateFlags()]))
 ])
 .then(([SQL])=>{
   db=new SQL.Database();db.run(SCHEMA_SQL);

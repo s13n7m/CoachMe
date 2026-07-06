@@ -118,6 +118,11 @@
   .cleared{margin-left:auto;font-family:var(--mono);font-size:11px;letter-spacing:0.14em;color:var(--pp-blue);border:1px dashed var(--pp-blue);border-radius:4px;padding:2px 10px;transform:rotate(-3deg);opacity:0;transition:opacity .25s;text-transform:uppercase;background:var(--panel);}
   .cleared.show{opacity:1;}
 
+  .star-toggle{font-size:16px;line-height:1;background:none;border:none;color:var(--faint);cursor:pointer;padding:2px 4px;touch-action:manipulation;}
+  .star-toggle:hover{color:var(--warn);}
+  .star-toggle.on{color:var(--warn);}
+  .qbtn .star{color:var(--warn);font-size:12px;flex:0 0 auto;}
+
   .readystrip{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-bottom:14px;}
   .readystrip .rt{font-size:13px;color:var(--heading);font-weight:700;flex:1;}
   .readystrip .rt small{display:block;color:var(--muted);font-weight:400;font-size:12px;margin-top:1px;}
@@ -253,25 +258,27 @@
   .right-col{display:none;}
 
   .sidebar-toggle{
-    font-family:var(--sans);
-    font-size:16px;
+    font-family:var(--mono);
+    font-size:12px;
     font-weight:700;
     line-height:1;
     background:var(--panel);
     border:1px solid var(--line);
-    border-radius:99px;
+    border-left:none;
+    border-radius:0 8px 8px 0;
     color:var(--muted);
-    width:34px;
-    height:34px;
-    display:grid;
-    place-items:center;
+    width:16px;
+    height:46px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     cursor:pointer;
     touch-action:manipulation;
     position:fixed;
-    top:calc(var(--header-h) + 14px);
-    left:16px;
+    top:calc(var(--header-h) + 22px);
+    left:0;
     z-index:15;
-    box-shadow:0 1px 4px rgba(0,48,135,0.12);
+    box-shadow:1px 1px 3px rgba(0,48,135,0.1);
     transition:left .15s ease;
   }
   .sidebar-toggle:hover{color:var(--pp-blue);border-color:var(--pp-sky);}
@@ -279,7 +286,7 @@
   body.sidebar-collapsed aside{display:none;}
 
   @media (min-width:861px){
-    body:not(.sidebar-collapsed) .sidebar-toggle{left:306px;}
+    body:not(.sidebar-collapsed) .sidebar-toggle{left:290px;}
   }
 
   .col-resizer{display:none;}

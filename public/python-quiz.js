@@ -2,15 +2,41 @@ const QUIZ_QUESTIONS = [{"id": 0, "topic": "DataFrame basics & inspection", "dif
 
 let current=0;
 const solved=new Set();
+const flagged=new Set();
 const savedQueries={};
 let startIndex=0;
 
 function buildSidebar(){
   let html="";
   QUIZ_QUESTIONS.forEach((q,i)=>{
-    html+='<button class="qbtn'+(solved.has(q.id)?" done":"")+'" data-i="'+i+'"><span class="dot">'+(solved.has(q.id)?"\u2713":"")+'</span><span class="lbl">'+(i+1)+'. '+q.topic+'</span></button>';
+    html+='<button class="qbtn'+(solved.has(q.id)?" done":"")+'" data-i="'+i+'"><span class="dot">'+(solved.has(q.id)?"\u2713":"")+'</span><span class="star">'+(flagged.has(q.id)?"\u2605":"")+'</span><span class="lbl">'+(i+1)+'. '+q.topic+'</span></button>';
   });
   return html;
+}
+
+function hydrateFlags(){
+  return fetchFlaggedIds("python","quiz").then(ids=>ids.forEach(id=>flagged.add(id)));
+}
+
+function toggleFlag(id){
+  const on=!flagged.has(id);
+  if(on) flagged.add(id); else flagged.delete(id);
+  setQuestionFlag("python","quiz",id,on);
+  renderStar(id);
+  const btn=document.querySelector('.qbtn[data-i="'+current+'"]');
+  if(btn){
+    const st=btn.querySelector(".star");
+    if(st) st.textContent=on?"\u2605":"";
+  }
+}
+
+function renderStar(id){
+  const btn=document.getElementById("starToggle");
+  if(!btn) return;
+  const on=flagged.has(id);
+  btn.textContent=on?"\u2605":"\u2606";
+  btn.classList.toggle("on",on);
+  btn.setAttribute("aria-label",on?"Marked to come back to":"Mark to come back to");
 }
 function buildMain(){
   return '<main>'
@@ -34,7 +60,9 @@ function updateProgress(){
 
 function loadQuestion(i){
   current=i;const q=QUIZ_QUESTIONS[i];
-  document.getElementById("qhead").innerHTML='<span class="pill '+q.diff+'">'+q.diff+'</span><span class="pill">'+q.topic+'</span><span class="pill est" id="estBadge">'+estimateLabel(q.diff)+'</span><span class="qtimer" id="qtimerMain">00:00</span><span class="cleared '+(solved.has(q.id)?"show":"")+'" id="clearedStamp">cleared</span>';
+  document.getElementById("qhead").innerHTML='<button class="star-toggle" id="starToggle" type="button" aria-label="Mark to come back to">☆</button><span class="pill '+q.diff+'">'+q.diff+'</span><span class="pill">'+q.topic+'</span><span class="pill est" id="estBadge">'+estimateLabel(q.diff)+'</span><span class="qtimer" id="qtimerMain">00:00</span><span class="cleared '+(solved.has(q.id)?"show":"")+'" id="clearedStamp">cleared</span>';
+  renderStar(q.id);
+  document.getElementById("starToggle").addEventListener("click",()=>toggleFlag(q.id));
   startQuestionTimer(q.diff);
   document.getElementById("askText").textContent=q.ask;
   document.getElementById("sql").value=savedQueries[q.id]||"";
@@ -233,7 +261,7 @@ Promise.all([
 ])
 .then(([_pyodide,unlocked])=>{
   if(!unlocked){showLocked();return;}
-  return hydrateProgress().then(()=>{
+  return Promise.all([hydrateProgress(),hydrateFlags()]).then(()=>{
     const app=document.getElementById("app");app.className="";
     app.innerHTML='<div class="wrap"><aside id="sidebar">'+buildSidebar()+'</aside>'+buildMain()+'<div class="col-resizer" id="colResizer"></div><div class="right-col" id="rightCol"></div></div>';
     document.getElementById("schema").innerHTML=buildPySchema();
