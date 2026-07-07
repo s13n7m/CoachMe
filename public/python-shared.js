@@ -172,10 +172,12 @@ function mdEscape(s){
   return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 function mdInline(s){
-  s=s.replace(/`([^`]+)`/g,"<code>$1</code>");
+  const codeSpans=[];
+  s=s.replace(/`([^`]+)`/g,(m,p1)=>{codeSpans.push(p1);return "@@CODESPAN"+(codeSpans.length-1)+"@@";});
   s=s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
   s=s.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g,"$1<em>$2</em>");
   s=s.replace(/(^|[^_])_([^_\n]+)_(?!_)/g,"$1<em>$2</em>");
+  s=s.replace(/@@CODESPAN(\d+)@@/g,(m,idx)=>"<code>"+codeSpans[+idx]+"</code>");
   return s;
 }
 function renderMarkdown(raw){
