@@ -85,7 +85,7 @@ function syncHeaderHeight(){
   document.documentElement.style.setProperty("--header-h",h.offsetHeight+"px");
 }
 
-const QUESTION_TIME_BUDGET={easy:180,medium:420,hard:720};
+const QUESTION_TIME_BUDGET={easy:180,medium:420,hard:720,recall:600};
 function estimateLabel(diff){return "~"+Math.round((QUESTION_TIME_BUDGET[diff]||420)/60)+" min";}
 let questionTimerInterval=null,questionTimerSeconds=0,qtimerObserver=null;
 function startQuestionTimer(diff){
