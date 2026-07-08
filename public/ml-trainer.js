@@ -347,7 +347,9 @@ function hydrateProgress(){
     .then(({data,error})=>{
       if(error||!data) return;
       data.forEach(r=>{
-        if(r.passed){solved.add(r.question_id);savedAnswers[r.question_id]=r.query_text;}
+        const q=QUESTIONS.find(x=>x.id===r.question_id);
+        if(r.passed)solved.add(r.question_id);
+        if(r.passed||(q&&q.recall))savedAnswers[r.question_id]=r.query_text;
       });
       if(data.length) startIndex=data[data.length-1].question_id;
     });
