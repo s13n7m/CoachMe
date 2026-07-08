@@ -311,6 +311,10 @@ function formatSQL(sql){
 
 function buildSidebarFilterBar(){
   return '<div class="sidebar-filters" id="sidebarFilters">'
+    +'<div class="filter-row topic-toolbar">'
+      +'<button class="fa-btn" id="expandAllBtn">Expand all</button>'
+      +'<button class="fa-btn" id="collapseAllBtn">Collapse all</button>'
+    +'</div>'
     +'<div class="filter-row"><span class="filter-lbl">Difficulty</span>'
       +'<button class="fchip" data-group="diff" data-value="easy">Easy</button>'
       +'<button class="fchip" data-group="diff" data-value="medium">Medium</button>'
@@ -399,6 +403,18 @@ function initTopicCollapse(storageKey){
     });
   }
   sidebar.addEventListener("click",e=>{
+    if(e.target.closest("#expandAllBtn")){
+      collapsedSet.clear();
+      localStorage.setItem(storageKey,JSON.stringify([...collapsedSet]));
+      apply();
+      return;
+    }
+    if(e.target.closest("#collapseAllBtn")){
+      sidebar.querySelectorAll(".topic").forEach(el=>collapsedSet.add(el.dataset.topic));
+      localStorage.setItem(storageKey,JSON.stringify([...collapsedSet]));
+      apply();
+      return;
+    }
     const head=e.target.closest(".topic-head");
     if(!head) return;
     const topicEl=head.closest(".topic");
