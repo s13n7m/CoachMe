@@ -275,6 +275,16 @@
   #explainText p{margin:0 0 12px;}
   #explainText p:last-child{margin-bottom:0;}
   #explainText h4,#explainText h5,#explainText h6{margin:16px 0 8px;color:var(--heading);}
+  .coverage-badge{padding:12px 14px;border-bottom:1px solid var(--line);}
+  .coverage-pct{font-family:var(--mono);font-size:20px;font-weight:700;margin-right:10px;}
+  .coverage-badge.ok .coverage-pct{color:var(--good);}
+  .coverage-badge.no .coverage-pct{color:var(--bad);}
+  .coverage-frac{font-size:13px;color:var(--muted);}
+  .coverage-bar{margin-top:8px;height:6px;border-radius:99px;background:var(--panel2);overflow:hidden;}
+  .coverage-bar > i{display:block;height:100%;border-radius:99px;transition:width .3s;}
+  .coverage-badge.ok .coverage-bar > i{background:var(--good);}
+  .coverage-badge.no .coverage-bar > i{background:var(--bad);}
+  #explainText ul li{margin:4px 0;}
   #explainText ol,#explainText ul{margin:0 0 12px;padding-left:22px;}
   #explainText li{margin:0 0 6px;}
   #explainText li:last-child{margin-bottom:0;}

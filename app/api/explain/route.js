@@ -62,6 +62,33 @@ const GRADE_SYSTEM_PROMPT =
     "Keep it honest but encouraging. Format as clean Markdown (no headers), " +
     "under 300 words.";
 
+const CONCEPT_GRADE_SYSTEM_PROMPT =
+    "You are grading an experienced candidate's typed answer against a specific " +
+    "checklist of key concepts for a PayPal Consumer Portfolio Growth Machine " +
+    "Learning Fundamentals interview question. You'll be given the interview " +
+    "question, a numbered checklist of key concepts a strong answer should " +
+    "cover, and the candidate's own typed answer. For each concept, decide " +
+    "whether the answer clearly demonstrates it - give credit for correct " +
+    "understanding even if they use different wording, phrasing, or examples " +
+    "than the checklist; do not require a verbatim match, and do not give " +
+    "credit for a concept that is not genuinely present just because related " +
+    "words appear nearby. " +
+    "Respond in EXACTLY this structure and nothing before it:\n" +
+    "Line 1, alone, in exactly this form with no other text on it: " +
+    "COVERED: <n>/<total> (where <n> is how many concepts were covered and " +
+    "<total> is the total number of concepts given).\n" +
+    "Then a blank line, then a markdown bullet list with exactly one line per " +
+    "concept, in the same order given, each starting with the literal " +
+    "character ✓ if covered or ✗ if not covered, then a space, then the " +
+    "concept in bold, then a short dash-separated clause (no more than one " +
+    "sentence) grounded in what the candidate actually wrote, or 'not " +
+    "mentioned' if it's genuinely absent.\n" +
+    "Then a blank line, then a short closing paragraph (2-3 sentences) of " +
+    "honest, encouraging overall feedback, speaking directly to the candidate " +
+    "in the second person.\n" +
+    "Do not use markdown headers. Do not add any text, preamble, or verdict " +
+    "before the COVERED line.";
+
 function json(body, status) {
     return new Response(JSON.stringify(body), {
         status: status || 200,
@@ -121,6 +148,9 @@ export async function POST(req) {
     const solution = capped(body.solution, 4000);
     const userCode = kind === "attempt" ? capped(body.userCode, 4000) : null;
     const studentAnswer = kind === "grade" ? capped(body.studentAnswer, 3000) : null;
+    const keyConcepts = kind === "grade" && Array.isArray(body.keyConcepts) ?
+        body.keyConcepts.filter((c) => typeof c === "string" && c.length > 0 && c.length <= 200).slice(0, 10) :
+        null;
 
     if (!track || !mode || !kind || questionId === null || !ask || !solution) {
         return json({ error: "Bad request." }, 400);
@@ -177,6 +207,12 @@ export async function POST(req) {
         userMessage +=
             "\n\nYour attempt (which did NOT pass):\n" + userCode +
             "\n\nTell them specifically where their attempt diverges from a correct approach and how to fix it, then briefly walk them through the corrected reasoning - speaking directly to them the whole time (e.g. 'your query misses...', 'you need to add...').";
+    } else if (kind === "grade" && keyConcepts && keyConcepts.length) {
+        userMessage +=
+            "\n\nYour answer:\n" + studentAnswer +
+            "\n\nKey concepts a strong answer should cover:\n" +
+            keyConcepts.map((c, i) => (i + 1) + ". " + c).join("\n") +
+            "\n\nGrade this answer against the key concepts checklist above, following the exact output format specified.";
     } else if (kind === "grade") {
         userMessage +=
             "\n\nYour answer:\n" + studentAnswer +
@@ -195,7 +231,9 @@ export async function POST(req) {
         body: JSON.stringify({
             model,
             max_tokens: MAX_TOKENS,
-            system: kind === "grade" ? GRADE_SYSTEM_PROMPT : SYSTEM_PROMPT,
+            system: kind === "grade" ?
+                (keyConcepts && keyConcepts.length ? CONCEPT_GRADE_SYSTEM_PROMPT : GRADE_SYSTEM_PROMPT) :
+                SYSTEM_PROMPT,
             messages: [{ role: "user", content: userMessage }],
         }),
     });
