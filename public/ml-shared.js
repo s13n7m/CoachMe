@@ -206,6 +206,80 @@ function renderMarkdown(raw){
   return html||"<p></p>";
 }
 
+function buildSidebarFilterBar(){
+  return '<div class="sidebar-filters" id="sidebarFilters">'
+    +'<div class="filter-row"><span class="filter-lbl">Difficulty</span>'
+      +'<button class="fchip" data-group="diff" data-value="easy">Easy</button>'
+      +'<button class="fchip" data-group="diff" data-value="medium">Medium</button>'
+      +'<button class="fchip" data-group="diff" data-value="hard">Hard</button>'
+      +'<button class="fchip" data-group="diff" data-value="recall">Recall</button>'
+    +'</div>'
+    +'<div class="filter-row"><span class="filter-lbl">Time</span>'
+      +'<button class="fchip" data-group="time" data-value="quick">&lt;5 min</button>'
+      +'<button class="fchip" data-group="time" data-value="medium">5-10 min</button>'
+      +'<button class="fchip" data-group="time" data-value="long">10+ min</button>'
+    +'</div>'
+    +'<div class="filter-row">'
+      +'<button class="fchip fchip-star" data-group="star" data-value="starred">&#9733; Starred only</button>'
+      +'<button class="filter-clear" id="filterClearBtn" style="display:none">Clear filters</button>'
+    +'</div>'
+  +'</div>';
+}
+const __sidebarFilterState={diff:new Set(),time:new Set(),star:false};
+function __questionTimeBucket(diff){
+  const secs=(typeof QUESTION_TIME_BUDGET!=="undefined" && QUESTION_TIME_BUDGET[diff])||420;
+  if(secs<300) return "quick";
+  if(secs<600) return "medium";
+  return "long";
+}
+function __questionMatchesFilters(q){
+  if(__sidebarFilterState.diff.size && !__sidebarFilterState.diff.has(q.diff)) return false;
+  if(__sidebarFilterState.time.size && !__sidebarFilterState.time.has(__questionTimeBucket(q.diff))) return false;
+  if(__sidebarFilterState.star && !flagged.has(q.id)) return false;
+  return true;
+}
+function applySidebarFilters(){
+  const sidebar=document.getElementById("sidebar");
+  if(!sidebar) return;
+  sidebar.querySelectorAll(".qbtn").forEach(btn=>{
+    const q=QUESTIONS[+btn.dataset.i];
+    btn.style.display=__questionMatchesFilters(q)?"":"none";
+  });
+  sidebar.querySelectorAll(".topic").forEach(topicEl=>{
+    const anyVisible=Array.from(topicEl.querySelectorAll(".qbtn")).some(b=>b.style.display!=="none");
+    topicEl.style.display=anyVisible?"":"none";
+  });
+  const anyActive=__sidebarFilterState.diff.size||__sidebarFilterState.time.size||__sidebarFilterState.star;
+  const clearBtn=document.getElementById("filterClearBtn");
+  if(clearBtn) clearBtn.style.display=anyActive?"":"none";
+}
+function initSidebarFilters(){
+  const bar=document.getElementById("sidebarFilters");
+  if(!bar) return;
+  bar.addEventListener("click",e=>{
+    const clearBtn=e.target.closest("#filterClearBtn");
+    if(clearBtn){
+      __sidebarFilterState.diff.clear();__sidebarFilterState.time.clear();__sidebarFilterState.star=false;
+      bar.querySelectorAll(".fchip").forEach(c=>c.classList.remove("active"));
+      applySidebarFilters();
+      return;
+    }
+    const chip=e.target.closest(".fchip");
+    if(!chip) return;
+    const group=chip.dataset.group,value=chip.dataset.value;
+    if(group==="star"){
+      __sidebarFilterState.star=!__sidebarFilterState.star;
+      chip.classList.toggle("active",__sidebarFilterState.star);
+    }else{
+      const set=__sidebarFilterState[group];
+      if(set.has(value)){set.delete(value);chip.classList.remove("active");}
+      else{set.add(value);chip.classList.add("active");}
+    }
+    applySidebarFilters();
+  });
+  applySidebarFilters();
+}
+
 function initTopicCollapse(storageKey){
   const sidebar=document.getElementById("sidebar");
   if(!sidebar) return;

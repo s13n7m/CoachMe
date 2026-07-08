@@ -91,6 +91,20 @@
 
   .wrap{display:flex;align-items:stretch;min-height:calc(100vh - var(--header-h));min-height:calc(100dvh - var(--header-h));}
   aside{width:290px;flex:0 0 290px;border-right:1px solid var(--line);background:var(--panel);overflow-y:auto;max-height:calc(100vh - var(--header-h));max-height:calc(100dvh - var(--header-h));position:sticky;top:var(--header-h);}
+  .sidebar-filters{padding:10px 14px 12px;border-bottom:1px solid var(--table-border);background:var(--tint2);}
+  .filter-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;}
+  .filter-row:last-child{margin-bottom:0;}
+  .filter-lbl{font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--faint);font-weight:700;flex:0 0 auto;margin-right:2px;}
+  .fchip{font-family:var(--sans);font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;touch-action:manipulation;}
+  .fchip:hover{border-color:var(--pp-sky);}
+  .fchip[data-value="easy"].active{color:var(--good);border-color:var(--good-border);background:var(--good-dim);}
+  .fchip[data-value="medium"].active{color:var(--pp-blue);border-color:var(--accent-dim);background:var(--tint);}
+  .fchip[data-value="hard"].active{color:var(--bad);border-color:var(--bad-border);background:var(--bad-dim);}
+  .fchip[data-value="recall"].active{color:var(--recall);border-color:var(--recall);background:var(--recall-dim);}
+  .fchip[data-group="time"].active{color:var(--pp-blue);border-color:var(--accent-dim);background:var(--tint);}
+  .fchip-star.active{color:var(--warn);border-color:var(--warn-border);background:var(--warn-dim);}
+  .filter-clear{font-family:var(--sans);font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;border:1px dashed var(--faint);background:none;color:var(--muted);cursor:pointer;margin-left:auto;touch-action:manipulation;}
+  .filter-clear:hover{border-color:var(--pp-sky);color:var(--pp-blue);}
   .topic{border-bottom:1px solid var(--table-border);}
   .topic-head{display:flex;align-items:center;gap:8px;padding:11px 16px 7px;cursor:pointer;user-select:none;touch-action:manipulation;}
   .topic-head .tname{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);font-weight:700;flex:1;line-height:1.3;}

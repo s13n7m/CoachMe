@@ -293,6 +293,7 @@ function toggleFlag(id){
     const st=btn.querySelector(".star");
     if(st) st.textContent=on?"★":"";
   }
+  applySidebarFilters();
 }
 
 function renderStar(id){
@@ -358,7 +359,7 @@ Promise.all([
 ])
 .then(()=>{
   const app=document.getElementById("app");app.className="";
-  app.innerHTML='<div class="wrap"><aside id="sidebar">'+buildSidebar()+'</aside>'+buildMain()+'<div class="col-resizer" id="colResizer"></div><div class="right-col" id="rightCol"></div></div>';
+  app.innerHTML='<div class="wrap"><aside id="sidebar">'+buildSidebarFilterBar()+buildSidebar()+'</aside>'+buildMain()+'<div class="col-resizer" id="colResizer"></div><div class="right-col" id="rightCol"></div></div>';
   document.getElementById("schema").innerHTML=buildPySchema();
   document.getElementById("totalCount").textContent=requiredCount();
   document.querySelectorAll(".qbtn").forEach(b=>b.addEventListener("click",()=>loadQuestion(+b.dataset.i)));
@@ -369,6 +370,7 @@ Promise.all([
   initExplainModelSelect();
   initShellLayout();
   initTopicCollapse("collapsedTopicsPython");
+  initSidebarFilters();
   document.getElementById("solBtn").addEventListener("click",()=>document.getElementById("solution").classList.toggle("show"));
   document.getElementById("resetBtn").addEventListener("click",()=>{
     const q=QUESTIONS[current];
