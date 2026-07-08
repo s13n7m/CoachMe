@@ -311,6 +311,9 @@ function formatSQL(sql){
 
 function buildSidebarFilterBar(){
   return '<div class="sidebar-filters" id="sidebarFilters">'
+    +'<div class="filter-row">'
+      +'<input type="search" id="sidebarSearch" class="sidebar-search" placeholder="Search topics or questions...">'
+    +'</div>'
     +'<div class="filter-row topic-toolbar">'
       +'<button class="fa-btn" id="expandAllBtn">Expand all</button>'
       +'<button class="fa-btn" id="collapseAllBtn">Collapse all</button>'
@@ -332,7 +335,7 @@ function buildSidebarFilterBar(){
     +'</div>'
   +'</div>';
 }
-const __sidebarFilterState={diff:new Set(),time:new Set(),star:false};
+const __sidebarFilterState={diff:new Set(),time:new Set(),star:false,search:""};
 function __questionTimeBucket(diff){
   const secs=(typeof QUESTION_TIME_BUDGET!=="undefined" && QUESTION_TIME_BUDGET[diff])||360;
   if(secs<300) return "quick";
@@ -343,6 +346,10 @@ function __questionMatchesFilters(q){
   if(__sidebarFilterState.diff.size && !__sidebarFilterState.diff.has(q.diff)) return false;
   if(__sidebarFilterState.time.size && !__sidebarFilterState.time.has(__questionTimeBucket(q.diff))) return false;
   if(__sidebarFilterState.star && !flagged.has(q.id)) return false;
+  if(__sidebarFilterState.search){
+    const hay=(q.topic+" "+(q.ask||"")+" "+(q.prompt||"")).toLowerCase();
+    if(!hay.includes(__sidebarFilterState.search)) return false;
+  }
   return true;
 }
 function applySidebarFilters(){
@@ -356,18 +363,26 @@ function applySidebarFilters(){
     const anyVisible=Array.from(topicEl.querySelectorAll(".qbtn")).some(b=>b.style.display!=="none");
     topicEl.style.display=anyVisible?"":"none";
   });
-  const anyActive=__sidebarFilterState.diff.size||__sidebarFilterState.time.size||__sidebarFilterState.star;
+  const anyActive=__sidebarFilterState.diff.size||__sidebarFilterState.time.size||__sidebarFilterState.star||__sidebarFilterState.search;
   const clearBtn=document.getElementById("filterClearBtn");
   if(clearBtn) clearBtn.style.display=anyActive?"":"none";
 }
 function initSidebarFilters(){
   const bar=document.getElementById("sidebarFilters");
   if(!bar) return;
+  const searchInput=document.getElementById("sidebarSearch");
+  if(searchInput){
+    searchInput.addEventListener("input",()=>{
+      __sidebarFilterState.search=searchInput.value.trim().toLowerCase();
+      applySidebarFilters();
+    });
+  }
   bar.addEventListener("click",e=>{
     const clearBtn=e.target.closest("#filterClearBtn");
     if(clearBtn){
-      __sidebarFilterState.diff.clear();__sidebarFilterState.time.clear();__sidebarFilterState.star=false;
+      __sidebarFilterState.diff.clear();__sidebarFilterState.time.clear();__sidebarFilterState.star=false;__sidebarFilterState.search="";
       bar.querySelectorAll(".fchip").forEach(c=>c.classList.remove("active"));
+      if(searchInput) searchInput.value="";
       applySidebarFilters();
       return;
     }
