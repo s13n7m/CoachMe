@@ -152,6 +152,10 @@
   .star-toggle:hover{color:var(--warn);}
   .star-toggle.on{color:var(--warn);}
   .qbtn .star{color:var(--warn);font-size:12px;flex:0 0 auto;}
+  .tagpill{flex:0 0 auto;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.04em;padding:1px 5px;border-radius:4px;}
+  .tagpill-sql{color:var(--pp-blue);background:var(--tint);}
+  .tagpill-pycalc{color:var(--good);background:var(--good-dim);}
+  .tagpill:empty{display:none;}
 
   .readystrip{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-bottom:14px;}
   .readystrip .rt{font-size:13px;color:var(--heading);font-weight:700;flex:1;}

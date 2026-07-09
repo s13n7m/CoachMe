@@ -7,7 +7,7 @@ const ALLOWED_MODELS = {
 };
 const DEFAULT_MODEL = "sonnet";
 
-const TRACKS = ["sql", "python", "ml"];
+const TRACKS = ["sql", "python", "ml", "finalprep"];
 const MODES = ["trainer", "quiz"];
 const KINDS = ["solution", "attempt", "grade"];
 const RATE_LIMIT_PER_HOUR = 30;
@@ -146,6 +146,7 @@ export async function POST(req) {
     const ask = capped(body.ask, 1000);
     const prompt = typeof body.prompt === "string" && body.prompt.length <= 1000 ? body.prompt : "";
     const solution = capped(body.solution, 4000);
+    const engine = ["sql", "python"].includes(body.engine) ? body.engine : null;
     const userCode = kind === "attempt" ? capped(body.userCode, 4000) : null;
     const studentAnswer = kind === "grade" ? capped(body.studentAnswer, 3000) : null;
     const keyConcepts = kind === "grade" && Array.isArray(body.keyConcepts) ?
@@ -195,6 +196,12 @@ export async function POST(req) {
         "Dialect: SQLite (running in-browser via sql.js)." :
         track === "python" ?
         "Environment: Python with pandas, numpy and scipy (running in-browser via Pyodide). Answers are assigned to a variable named result." :
+        track === "finalprep" && engine === "sql" ?
+        "Dialect: SQLite (running in-browser via sql.js)." :
+        track === "finalprep" && engine === "python" ?
+        "Environment: Python with pandas, numpy and scipy (running in-browser via Pyodide). Answers are assigned to a variable named result." :
+        track === "finalprep" ?
+        "This is a final-prep recall/review question covering SQL and Python data wrangling, not a coding exercise." :
         "This is a conceptual Machine Learning Fundamentals discussion question, not a coding exercise.";
 
     let userMessage =
