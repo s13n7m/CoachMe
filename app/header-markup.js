@@ -5,6 +5,7 @@ function makeHeader({ tick, subtitle, quizHref, quizLabel, quizLocked, activeTra
   const pySelected = activeTrack === "python" ? " selected" : "";
   const mlSelected = activeTrack === "ml" ? " selected" : "";
   const finalPrepSelected = activeTrack === "finalprep" ? " selected" : "";
+  const tradingSelected = activeTrack === "trading" ? " selected" : "";
   return `
   <div class="brand">
     <img class="logo" src="${LOGO_SRC}" alt="PayPal">
@@ -13,6 +14,7 @@ function makeHeader({ tick, subtitle, quizHref, quizLabel, quizLocked, activeTra
       <option value="/python"${pySelected}>Python Trainer</option>
       <option value="/ml"${mlSelected}>ML Fundamentals</option>
       <option value="/final-prep"${finalPrepSelected}>Final Prep</option>
+      <option value="/trading"${tradingSelected}>Trading</option>
     </select>
     <span class="tick" id="qtick">${tick}</span>
     <small>${subtitle}</small>
@@ -85,4 +87,13 @@ export const FINAL_PREP_HEADER_HTML = makeHeader({
   quizLabel: "Quiz (soon)",
   quizLocked: true,
   activeTrack: "finalprep",
+});
+
+export const TRADING_HEADER_HTML = makeHeader({
+  tick: "Q1",
+  subtitle: "FX Trading Basics &middot; market structure, risk, FVG &amp; IFVG",
+  quizHref: "#",
+  quizLabel: "Quiz (soon)",
+  quizLocked: true,
+  activeTrack: "trading",
 });

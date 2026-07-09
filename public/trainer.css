@@ -155,6 +155,8 @@
   .tagpill{flex:0 0 auto;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.04em;padding:1px 5px;border-radius:4px;}
   .tagpill-sql{color:var(--pp-blue);background:var(--tint);}
   .tagpill-pycalc{color:var(--good);background:var(--good-dim);}
+  .tagpill-mc{color:var(--pp-blue);background:var(--tint);}
+  .tagpill-written{color:var(--good);background:var(--good-dim);}
   .tagpill:empty{display:none;}
 
   .readystrip{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-bottom:14px;}

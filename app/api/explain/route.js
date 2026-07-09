@@ -7,7 +7,7 @@ const ALLOWED_MODELS = {
 };
 const DEFAULT_MODEL = "sonnet";
 
-const TRACKS = ["sql", "python", "ml", "finalprep"];
+const TRACKS = ["sql", "python", "ml", "finalprep", "trading"];
 const MODES = ["trainer", "quiz"];
 const KINDS = ["solution", "attempt", "grade"];
 const RATE_LIMIT_PER_HOUR = 30;
@@ -202,6 +202,8 @@ export async function POST(req) {
         "Environment: Python with pandas, numpy and scipy (running in-browser via Pyodide). Answers are assigned to a variable named result." :
         track === "finalprep" ?
         "This is a final-prep recall/review question covering SQL and Python data wrangling, not a coding exercise." :
+        track === "trading" ?
+        "This is a conceptual FX trading question covering market structure, risk management, and price-action concepts such as Fair Value Gaps (FVG) and Inverse Fair Value Gaps (IFVG), not a coding exercise." :
         "This is a conceptual Machine Learning Fundamentals discussion question, not a coding exercise.";
 
     let userMessage =
