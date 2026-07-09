@@ -166,7 +166,7 @@ const QUESTIONS = [
     "solution": "WITH totals AS (\n  SELECT customer_id, SUM(amount) AS total_amount\n  FROM transactions WHERE status='completed' GROUP BY customer_id\n)\nSELECT customer_id, total_amount, RANK() OVER (ORDER BY total_amount DESC) AS rnk\nFROM totals ORDER BY rnk;",
     "ordered": false,
     "bonus": false,
-    "id": "fp-1-1",
+    "id": 0,
     "topic": "SQL: Window functions & ranking",
     "subtopic": "RANK() over an aggregate"
   },
@@ -178,7 +178,7 @@ const QUESTIONS = [
     "solution": "SELECT customer_id, transaction_id, txn_date,\n  ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY txn_date) AS txn_seq\nFROM transactions WHERE status='completed' ORDER BY customer_id, txn_seq;",
     "ordered": false,
     "bonus": false,
-    "id": "fp-1-2",
+    "id": 1,
     "topic": "SQL: Window functions & ranking",
     "subtopic": "ROW_NUMBER() partitioned by group"
   },
@@ -190,12 +190,12 @@ const QUESTIONS = [
     "solution": "SELECT customer_id, transaction_id, amount, txn_date\nFROM (\n  SELECT *, ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY txn_date DESC) AS rn\n  FROM transactions WHERE status='completed'\n) t WHERE rn=1 ORDER BY customer_id;",
     "ordered": false,
     "bonus": false,
-    "id": "fp-1-3",
+    "id": 2,
     "topic": "SQL: Window functions & ranking",
     "subtopic": "Filtering to the latest row per group"
   },
   {
-    "id": "fp-1-recall",
+    "id": 3,
     "topic": "SQL: Window functions & ranking",
     "subtopic": null,
     "diff": "recall",
@@ -214,7 +214,7 @@ const QUESTIONS = [
     "solution": "SELECT customer_id, transaction_id, txn_date, amount,\n  LAG(amount) OVER (PARTITION BY customer_id ORDER BY txn_date) AS prev_amount\nFROM transactions WHERE status='completed' ORDER BY customer_id, txn_date;",
     "ordered": false,
     "bonus": false,
-    "id": "fp-2-1",
+    "id": 4,
     "topic": "SQL: LAG/LEAD & period-over-period change",
     "subtopic": "LAG() to pull the previous row"
   },
@@ -226,7 +226,7 @@ const QUESTIONS = [
     "solution": "SELECT customer_id, transaction_id, txn_date, amount,\n  amount - LAG(amount) OVER (PARTITION BY customer_id ORDER BY txn_date) AS amount_change\nFROM transactions WHERE status='completed' ORDER BY customer_id, txn_date;",
     "ordered": false,
     "bonus": false,
-    "id": "fp-2-2",
+    "id": 5,
     "topic": "SQL: LAG/LEAD & period-over-period change",
     "subtopic": "Computing change with arithmetic on window functions"
   },
@@ -238,12 +238,12 @@ const QUESTIONS = [
     "solution": "WITH changes AS (\n  SELECT customer_id, transaction_id, txn_date, amount,\n    amount - LAG(amount) OVER (PARTITION BY customer_id ORDER BY txn_date) AS amount_change\n  FROM transactions WHERE status='completed'\n)\nSELECT * FROM changes WHERE amount_change > 100 ORDER BY customer_id, txn_date;",
     "ordered": false,
     "bonus": false,
-    "id": "fp-2-3",
+    "id": 6,
     "topic": "SQL: LAG/LEAD & period-over-period change",
     "subtopic": "Filtering the output of a window function via CTE"
   },
   {
-    "id": "fp-2-recall",
+    "id": 7,
     "topic": "SQL: LAG/LEAD & period-over-period change",
     "subtopic": null,
     "diff": "recall",
@@ -262,7 +262,7 @@ const QUESTIONS = [
     "solution": "SELECT transaction_id, txn_date, strftime('%Y-%m', txn_date) AS txn_month\nFROM transactions WHERE status='completed' ORDER BY transaction_id;",
     "ordered": false,
     "bonus": false,
-    "id": "fp-3-1",
+    "id": 8,
     "topic": "SQL: Date bucketing & time-based analysis",
     "subtopic": "Bucketing dates with strftime"
   },
@@ -274,7 +274,7 @@ const QUESTIONS = [
     "solution": "SELECT strftime('%Y-%m', txn_date) AS txn_month, COUNT(*) AS n_txns, SUM(amount) AS total_amount\nFROM transactions WHERE status='completed' GROUP BY txn_month ORDER BY txn_month;",
     "ordered": true,
     "bonus": false,
-    "id": "fp-3-2",
+    "id": 9,
     "topic": "SQL: Date bucketing & time-based analysis",
     "subtopic": "Aggregating by date bucket"
   },
@@ -286,12 +286,12 @@ const QUESTIONS = [
     "solution": "WITH signup AS (\n  SELECT customer_id, event_date FROM events WHERE event_type='signup'\n),\nfirst_pay AS (\n  SELECT customer_id, MIN(event_date) AS first_payment_date FROM events WHERE event_type='first_payment' GROUP BY customer_id\n)\nSELECT s.customer_id, s.event_date AS signup_date, f.first_payment_date,\n  CAST(julianday(f.first_payment_date) - julianday(s.event_date) AS INTEGER) AS days_to_first_payment\nFROM signup s JOIN first_pay f ON f.customer_id = s.customer_id\nORDER BY s.customer_id;",
     "ordered": false,
     "bonus": false,
-    "id": "fp-3-3",
+    "id": 10,
     "topic": "SQL: Date bucketing & time-based analysis",
     "subtopic": "Measuring gaps between events with julianday"
   },
   {
-    "id": "fp-3-recall",
+    "id": 11,
     "topic": "SQL: Date bucketing & time-based analysis",
     "subtopic": null,
     "diff": "recall",
@@ -310,7 +310,7 @@ const QUESTIONS = [
     "solution": "SELECT customer_id, signup_date, strftime('%Y-%m', signup_date) AS signup_cohort\nFROM customers ORDER BY customer_id;",
     "ordered": false,
     "bonus": false,
-    "id": "fp-4-1",
+    "id": 12,
     "topic": "SQL: Cohort retention & funnel conversion",
     "subtopic": "Assigning a cohort from a date column"
   },
@@ -322,7 +322,7 @@ const QUESTIONS = [
     "solution": "WITH cohorts AS (\n  SELECT customer_id, strftime('%Y-%m', signup_date) AS signup_cohort FROM customers\n),\nrepeats AS (\n  SELECT DISTINCT customer_id FROM events WHERE event_type='repeat_payment'\n)\nSELECT c.signup_cohort, COUNT(*) AS cohort_size,\n  SUM(CASE WHEN r.customer_id IS NOT NULL THEN 1 ELSE 0 END) AS repeat_payers\nFROM cohorts c LEFT JOIN repeats r ON r.customer_id = c.customer_id\nGROUP BY c.signup_cohort ORDER BY c.signup_cohort;",
     "ordered": true,
     "bonus": false,
-    "id": "fp-4-2",
+    "id": 13,
     "topic": "SQL: Cohort retention & funnel conversion",
     "subtopic": "Cohort-level conversion with LEFT JOIN"
   },
@@ -334,12 +334,12 @@ const QUESTIONS = [
     "solution": "SELECT\n  COUNT(DISTINCT CASE WHEN event_type='signup' THEN customer_id END) AS signup,\n  COUNT(DISTINCT CASE WHEN event_type='activated' THEN customer_id END) AS activated,\n  COUNT(DISTINCT CASE WHEN event_type='first_payment' THEN customer_id END) AS first_payment,\n  COUNT(DISTINCT CASE WHEN event_type='repeat_payment' THEN customer_id END) AS repeat_payment\nFROM events;",
     "ordered": false,
     "bonus": false,
-    "id": "fp-4-3",
+    "id": 14,
     "topic": "SQL: Cohort retention & funnel conversion",
     "subtopic": "Full funnel counts with conditional COUNT DISTINCT"
   },
   {
-    "id": "fp-4-recall",
+    "id": 15,
     "topic": "SQL: Cohort retention & funnel conversion",
     "subtopic": null,
     "diff": "recall",
@@ -358,7 +358,7 @@ const QUESTIONS = [
     "solution": "result = transactions.merge(products, on='product_id', how='left')",
     "ordered": false,
     "bonus": false,
-    "id": "fp-5-1",
+    "id": 16,
     "topic": "Python: Merging & joining DataFrames",
     "subtopic": "merge() basics (left join)"
   },
@@ -370,7 +370,7 @@ const QUESTIONS = [
     "solution": "result = (transactions\n  .merge(products, on='product_id', how='left')\n  .query(\"status=='completed'\")\n  .groupby('category', as_index=False)['amount'].sum())",
     "ordered": false,
     "bonus": false,
-    "id": "fp-5-2",
+    "id": 17,
     "topic": "Python: Merging & joining DataFrames",
     "subtopic": "Merge then filter then groupby"
   },
@@ -382,12 +382,12 @@ const QUESTIONS = [
     "solution": "result = customers.merge(transactions, on='customer_id', how='left', indicator=True) \\\n  .query(\"_merge=='left_only'\")['customer_id'].nunique()",
     "ordered": false,
     "bonus": false,
-    "id": "fp-5-3",
+    "id": 18,
     "topic": "Python: Merging & joining DataFrames",
     "subtopic": "Anti-joins with indicator=True"
   },
   {
-    "id": "fp-5-recall",
+    "id": 19,
     "topic": "Python: Merging & joining DataFrames",
     "subtopic": null,
     "diff": "recall",
@@ -406,7 +406,7 @@ const QUESTIONS = [
     "solution": "result = transactions.duplicated().sum()",
     "ordered": false,
     "bonus": false,
-    "id": "fp-6-1",
+    "id": 20,
     "topic": "Python: Handling missing & duplicate data",
     "subtopic": "Finding duplicate rows"
   },
@@ -418,7 +418,7 @@ const QUESTIONS = [
     "solution": "result = transactions.drop_duplicates().shape[0]",
     "ordered": false,
     "bonus": false,
-    "id": "fp-6-2",
+    "id": 21,
     "topic": "Python: Handling missing & duplicate data",
     "subtopic": "Removing duplicates safely"
   },
@@ -430,12 +430,12 @@ const QUESTIONS = [
     "solution": "result = customers[['customer_id']].merge(\n  transactions.query(\"status=='completed'\").groupby('customer_id', as_index=False)['amount'].sum(),\n  on='customer_id', how='left'\n).fillna({'amount': 0})",
     "ordered": false,
     "bonus": false,
-    "id": "fp-6-3",
+    "id": 22,
     "topic": "Python: Handling missing & duplicate data",
     "subtopic": "Preserving zero-count groups with left-merge + fillna"
   },
   {
-    "id": "fp-6-recall",
+    "id": 23,
     "topic": "Python: Handling missing & duplicate data",
     "subtopic": null,
     "diff": "recall",
@@ -454,7 +454,7 @@ const QUESTIONS = [
     "solution": "result = transactions.assign(high_value=np.where(transactions['amount'] > 200, 'high_value', 'standard'))",
     "ordered": false,
     "bonus": false,
-    "id": "fp-7-1",
+    "id": 24,
     "topic": "Python: Apply, map & vectorized operations",
     "subtopic": "np.where for binary flags"
   },
@@ -466,7 +466,7 @@ const QUESTIONS = [
     "solution": "result = transactions.assign(amount_bucket=np.select(\n  [transactions['amount'] < 50, transactions['amount'] < 200],\n  ['small', 'medium'],\n  default='large'\n))",
     "ordered": false,
     "bonus": false,
-    "id": "fp-7-2",
+    "id": 25,
     "topic": "Python: Apply, map & vectorized operations",
     "subtopic": "np.select for multi-way buckets"
   },
@@ -478,12 +478,12 @@ const QUESTIONS = [
     "solution": "result = transactions.merge(customers[['customer_id','segment']], on='customer_id', how='left').assign(\n  adj_amount=lambda d: np.where(d['segment'] == 'Enterprise', d['amount'] * 0.9, d['amount'])\n)",
     "ordered": false,
     "bonus": false,
-    "id": "fp-7-3",
+    "id": 26,
     "topic": "Python: Apply, map & vectorized operations",
     "subtopic": "Vectorizing a conditional adjustment (vs .apply)"
   },
   {
-    "id": "fp-7-recall",
+    "id": 27,
     "topic": "Python: Apply, map & vectorized operations",
     "subtopic": null,
     "diff": "recall",
@@ -502,7 +502,7 @@ const QUESTIONS = [
     "solution": "result = transactions.query(\"status=='completed'\").assign(\n  rnk=lambda d: d.groupby('customer_id')['amount'].rank(method='min', ascending=False)\n)",
     "ordered": false,
     "bonus": false,
-    "id": "fp-8-1",
+    "id": 28,
     "topic": "Python: Ranking & deduplication (latest record per group)",
     "subtopic": "rank() within a group"
   },
@@ -514,7 +514,7 @@ const QUESTIONS = [
     "solution": "result = transactions.query(\"status=='completed'\").sort_values('txn_date').groupby('customer_id').tail(1)",
     "ordered": false,
     "bonus": false,
-    "id": "fp-8-2",
+    "id": 29,
     "topic": "Python: Ranking & deduplication (latest record per group)",
     "subtopic": "Latest-per-group via sort + groupby.tail"
   },
@@ -526,12 +526,12 @@ const QUESTIONS = [
     "solution": "result = transactions.query(\"status=='completed'\").sort_values('txn_date').drop_duplicates(subset='customer_id', keep='last')",
     "ordered": false,
     "bonus": false,
-    "id": "fp-8-3",
+    "id": 30,
     "topic": "Python: Ranking & deduplication (latest record per group)",
     "subtopic": "Latest-per-group via drop_duplicates(keep='last')"
   },
   {
-    "id": "fp-8-recall",
+    "id": 31,
     "topic": "Python: Ranking & deduplication (latest record per group)",
     "subtopic": null,
     "diff": "recall",
@@ -550,7 +550,7 @@ const QUESTIONS = [
     "solution": "SELECT p.category, COUNT(*) AS n_txns\nFROM transactions t JOIN products p ON p.product_id = t.product_id\nWHERE t.status='completed'\nGROUP BY p.category ORDER BY p.category;",
     "ordered": true,
     "bonus": false,
-    "id": "fp-9-1",
+    "id": 32,
     "topic": "Final Prep: Timed mixed mock",
     "subtopic": "Mock Q1 (SQL, easy) \u2014 warm-up join + count"
   },
@@ -562,7 +562,7 @@ const QUESTIONS = [
     "solution": "result = (transactions.query(\"status=='completed'\")\n  .groupby('customer_id', as_index=False)['amount'].sum()\n  .merge(customers[['customer_id','country','segment']], on='customer_id', how='left')\n  .sort_values('amount', ascending=False).head(3))",
     "ordered": true,
     "bonus": false,
-    "id": "fp-9-2",
+    "id": 33,
     "topic": "Final Prep: Timed mixed mock",
     "subtopic": "Mock Q2 (pandas, medium) \u2014 merge, aggregate, sort, head"
   },
@@ -574,12 +574,12 @@ const QUESTIONS = [
     "solution": "WITH changes AS (\n  SELECT customer_id, transaction_id, txn_date, amount,\n    julianday(txn_date) - julianday(LAG(txn_date) OVER (PARTITION BY customer_id ORDER BY txn_date)) AS days_since_prev,\n    ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY txn_date DESC) AS rn\n  FROM transactions WHERE status='completed'\n)\nSELECT customer_id, transaction_id, txn_date, amount, days_since_prev\nFROM changes WHERE rn=1 ORDER BY customer_id;",
     "ordered": false,
     "bonus": false,
-    "id": "fp-9-3",
+    "id": 34,
     "topic": "Final Prep: Timed mixed mock",
     "subtopic": "Mock Q3 (SQL, hard) \u2014 combine two patterns into one query"
   },
   {
-    "id": "fp-9-recall",
+    "id": 35,
     "topic": "Final Prep: Timed mixed mock",
     "subtopic": null,
     "diff": "recall",
