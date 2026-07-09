@@ -18,7 +18,7 @@ function makeHeader({ tick, subtitle, quizHref, quizLabel, quizLocked, activeTra
     <small>${subtitle}</small>
   </div>
   <div class="header-actions">
-    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">&#127769;</button>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
     <a class="quiz-link${quizLocked ? " locked" : ""}" id="${quizLocked !== undefined ? "quizBtn" : "backBtn"}" href="${quizHref}">${quizLabel}</a>
   </div>
   <div class="progress" id="progressLine">

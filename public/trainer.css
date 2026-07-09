@@ -322,8 +322,9 @@
   .quiz-link.locked{color:var(--faint);background:var(--tint2);border-color:var(--line);pointer-events:none;cursor:default;}
 
   .header-actions{display:flex;align-items:center;gap:10px;}
-  .theme-toggle{font-size:16px;line-height:1;background:var(--panel);border:1px solid var(--line);border-radius:99px;width:33px;height:33px;cursor:pointer;display:grid;place-items:center;touch-action:manipulation;}
+  .theme-toggle{font-size:16px;line-height:1;background:var(--panel);border:1px solid var(--line);border-radius:99px;width:33px;height:33px;cursor:pointer;display:grid;place-items:center;color:var(--text);touch-action:manipulation;}
   .theme-toggle:hover{border-color:var(--pp-sky);}
+  .theme-toggle svg{width:16px;height:16px;display:block;}
 
   .right-col{display:none;}
 
