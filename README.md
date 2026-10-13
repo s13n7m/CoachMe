@@ -1,9 +1,9 @@
-# SQL Trainer · Consumer Growth
+# CoachMe
 
 Interactive SQL practice tool for PayPal consumer-growth style interview prep, running on
 sql.js (in-browser SQLite) with progress synced across devices via Supabase.
 
-- **Live**: https://sql-trainer-paypal.vercel.app
+- **Live**: https://getcoachme.vercel.app
 - **Auth**: Google OAuth via Supabase Auth
 - **Progress**: every graded attempt (question id, query text, pass/fail, timestamp) is
   logged to a Postgres `attempts` table, protected by Row Level Security so each user only
