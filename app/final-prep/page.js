@@ -93,6 +93,7 @@ export default function FinalPrepPage() {
         }}
       />
       <Script src="/final-prep-trainer.js" strategy="afterInteractive" />
+      <Script src="/email-auth.js" strategy="afterInteractive" />
     </>
   );
 }

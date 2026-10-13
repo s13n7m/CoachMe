@@ -89,6 +89,7 @@ export default function PythonPage() {
         }}
       />
       <Script src="/python-trainer.js" strategy="afterInteractive" />
+      <Script src="/email-auth.js" strategy="afterInteractive" />
     </>
   );
 }

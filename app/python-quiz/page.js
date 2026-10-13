@@ -87,6 +87,7 @@ export default function PythonQuizPage() {
         }}
       />
       <Script src="/python-quiz.js" strategy="afterInteractive" />
+      <Script src="/email-auth.js" strategy="afterInteractive" />
     </>
   );
 }

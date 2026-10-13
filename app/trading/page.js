@@ -84,6 +84,7 @@ export default function TradingPage() {
         }}
       />
       <Script src="/trading-trainer.js" strategy="afterInteractive" />
+      <Script src="/email-auth.js" strategy="afterInteractive" />
     </>
   );
 }

@@ -89,6 +89,7 @@ export default function MlPage() {
         }}
       />
       <Script src="/ml-trainer.js" strategy="afterInteractive" />
+      <Script src="/email-auth.js" strategy="afterInteractive" />
     </>
   );
 }

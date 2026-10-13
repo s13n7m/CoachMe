@@ -87,6 +87,7 @@ export default function QuizPage() {
         }}
       />
       <Script src="/quiz.js" strategy="afterInteractive" />
+      <Script src="/email-auth.js" strategy="afterInteractive" />
     </>
   );
 }

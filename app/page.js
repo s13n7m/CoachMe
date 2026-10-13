@@ -88,6 +88,7 @@ export default function Page() {
         }}
       />
       <Script src="/trainer.js" strategy="afterInteractive" />
+      <Script src="/email-auth.js" strategy="afterInteractive" />
     </>
   );
 }
