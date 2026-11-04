@@ -1,12 +1,14 @@
 # CoachMe
 
-Interview-prep coaching app with hands-on trainers, live grading, and AI explanations.
+A self-coaching app with hands-on trainers, live grading, and AI explanations.
 It started as a SQL practice tool for a PayPal Consumer Portfolio Growth data science
-interview and has grown into a set of tracks.
+interview and has grown into an app that users can use to coach or train themselves
+on any topic of choice.
 
 - **Live**: https://getcoachme.vercel.app
 
-## Tracks
+## Current <i>Tracks</i> - 
+We are calling topics, <i>Tracks</i>. Below are the Tracks being used in development and testing of the app's functionality.
 
 | Track | Route | What it covers |
 | --- | --- | --- |
