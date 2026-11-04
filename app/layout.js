@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "SQL Trainer · Consumer Growth",
+  title: "CoachMe",
 };
 
 export default function RootLayout({ children }) {
