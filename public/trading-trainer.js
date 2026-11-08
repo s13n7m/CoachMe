@@ -926,17 +926,16 @@ function initSupabase(){
   supabaseClient=window.supabase.createClient(window.__SUPABASE_URL__, window.__SUPABASE_ANON_KEY__);
 }
 
-function showSignOutBtn(){
-  const btn=document.getElementById("signOutBtn");
-  btn.classList.add("visible");
-  btn.addEventListener("click",()=>{
+function showAccountMenu(){
+  document.getElementById("accountMenu").classList.add("visible");
+  document.getElementById("signOutBtn").addEventListener("click",()=>{
     supabaseClient.auth.signOut().then(()=>window.location.reload());
   });
 }
 
 function requireAuth(){
   return supabaseClient.auth.getSession().then(({data:{session}})=>{
-    if(session){currentUser=session.user;showSignOutBtn();return;}
+    if(session){currentUser=session.user;showAccountMenu();return;}
     const gate=document.getElementById("authGate");
     gate.style.display="flex";
     return new Promise(resolve=>{
@@ -947,7 +946,7 @@ function requireAuth(){
         if(session && !currentUser){
           currentUser=session.user;
           gate.style.display="none";
-          showSignOutBtn();
+          showAccountMenu();
           resolve();
         }
       });

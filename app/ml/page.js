@@ -8,10 +8,6 @@ export default function MlPage() {
     <>
       <header dangerouslySetInnerHTML={{ __html: ML_HEADER_HTML }} />
 
-      <button id="signOutBtn" className="sign-out-btn">
-        Sign out
-      </button>
-
       <div
         id="authGate"
         style={{
@@ -90,6 +86,7 @@ export default function MlPage() {
       />
       <Script src="/ml-trainer.js" strategy="afterInteractive" />
       <Script src="/email-auth.js" strategy="afterInteractive" />
+      <Script src="/account-menu.js" strategy="afterInteractive" />
     </>
   );
 }
