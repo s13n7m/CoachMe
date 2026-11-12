@@ -8,10 +8,6 @@ export default function QuizPage() {
     <>
       <header dangerouslySetInnerHTML={{ __html: QUIZ_HEADER_HTML }} />
 
-      <button id="signOutBtn" className="sign-out-btn">
-        Sign out
-      </button>
-
       <div
         id="authGate"
         style={{
@@ -88,6 +84,7 @@ export default function QuizPage() {
       />
       <Script src="/quiz.js" strategy="afterInteractive" />
       <Script src="/email-auth.js" strategy="afterInteractive" />
+      <Script src="/account-menu.js" strategy="afterInteractive" />
     </>
   );
 }
